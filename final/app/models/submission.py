@@ -1,20 +1,13 @@
 from app.extensions import db
 
-class Submission(db.Model):
-    __tablename__ = "submissions"
+class Answer(db.Model):
+    __tablename__ = "answers"
 
     id = db.Column(db.Integer, primary_key=True)
-    test_id = db.Column(db.Integer, db.ForeignKey("tests.id"), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    marks = db.Column(db.Integer, nullable=True)
-    graded_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    submitted_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
-    is_late = db.Column(db.Boolean, default=False)
-
-    __table_args__ = (db.UniqueConstraint("test_id", "student_id", name="unique_test_student"),)
+    submission_id = db.Column(db.Integer, db.ForeignKey("submissions.id"))
+    question_id = db.Column(db.Integer, db.ForeignKey("questions.id"))
+    answer_text = db.Column(db.Text)
 
     # Relationships
-    answers = db.relationship("Answer", backref="submission", lazy=True)
-
-    def __repr__(self):
-        return f"<Submission {self.id} for Test {self.test_id}>"
+    submission = db.relationship("Submission", back_populates="answers")
+    question = db.relationship("Question", back_populates="answers")

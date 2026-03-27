@@ -1,12 +1,18 @@
 from flask import Flask, render_template, request, redirect
+from sqlalchemy import create_engine
 from app.config import Config
 from app.extensions import db
-from app.models import User, Test, Question, Option, Submission, Answer
-
+from app.models.user import User
+from app.models.test import Test
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+
+
+conn_str = "mysql://root:Yohan969$$@localhost/exam_platform"
+engine = create_engine(conn_str, echo=True)
+conn = engine.connect()
 
 # ------
 # Routes
