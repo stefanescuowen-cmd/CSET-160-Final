@@ -8,5 +8,9 @@ class Answer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey("questions.id"), nullable=False)
     answer_text = db.Column(db.Text, nullable=False)
 
+    # Relationships
+    submission = db.relationship("Submission", back_populates="answers")
+    question = db.relationship("Question", back_populates="answers")
+
     def __repr__(self):
         return f"<Answer {self.id}>"
