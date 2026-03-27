@@ -2,20 +2,24 @@
 
 {% block content %}
 <h1>Create Test</h1>
-<form method="post">
-    <input type="text" name="title" placeholder="Test Title" required>
 
+<form method="POST" action="/create_test">
+    <label>Title:</label>
+    <input type="text" name="title" required><br><br>
+
+    <label>Teacher:</label>
     <select name="teacher_id" required>
         {% for teacher in teachers %}
-        <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
         {% endfor %}
-    </select>
+    </select><br><br>
 
-    <label>
-        <input type="checkbox" name="is_timed"> Timed Test
-    </label>
-    <input type="number" name="duration" placeholder="Duration (minutes)">
+    <label>Is Timed?</label>
+    <input type="checkbox" name="is_timed"><br><br>
+
+    <label>Duration (minutes):</label>
+    <input type="number" name="duration"><br><br>
 
     <button type="submit">Create Test</button>
 </form>
-{% endblock  %}
+{% endblock %}
