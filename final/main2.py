@@ -4,13 +4,17 @@ from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
 
+from flask import Flask, render_template, request
+from sqlalchemy import create_engine, text
+
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
-# ------
-# Routes
-# ------
+
+class Config:
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Yohan969$$@localhost/exam_platform"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -60,6 +64,4 @@ def tests():
     return render_template("tests.html", tests=all_tests)
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        app.run(debug=True)    
+    app.run(debug=True, port=5001)
