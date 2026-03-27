@@ -1,5 +1,5 @@
-create database exam_platform;
-use exam_platform;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Stevens2023!';
+FLUSH PRIVILEGES;
 
 -- Users
 create table users(
