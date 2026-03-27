@@ -1,6 +1,8 @@
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Stevens2023!';
 FLUSH PRIVILEGES;
 
+CREATE DATABASE exam_platform;
+
 -- Users
 create table users(
 id int auto_increment primary key,

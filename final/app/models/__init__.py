@@ -1,4 +1,3 @@
-# app/models/__init__.py
 from .user import User
 from .test import Test
 from .question import Question
