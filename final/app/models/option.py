@@ -4,8 +4,8 @@ class Option(db.Model):
     __tablename__ = "options"
 
     id = db.Column(db.Integer, primary_key=True)
-    question_id = db.Column(db.Integer, db.ForeignKey("questions.id"), nullable=False)
-    option_text = db.Column(db.Text, nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey("questions.id"))
+    option_text = db.Column(db.Text)
 
-    def __repr__(self):
-        return f"<Option {self.id}>"
+    # Relationships
+    question = db.relationship("Question", back_populates="options")
