@@ -5,9 +5,9 @@
 
 <ul>
     {% for test in tests %}
-    <li>{{ test.title }} (Created by: {{ test.teacher.name }})</li>
+        <li>{{ test.title }} (Created by: {{ test.teacher.name }})</li>
     {% endfor %}
 </ul>
 
 <a href="/create_test">Create New Test</a>
-{% endblock%}
+{% endblock %}
