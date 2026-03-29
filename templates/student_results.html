@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ student.name }} - Test Results</h1>
+
+<ul>
+    {% for submission in submissions %}
+    <li>
+        Test: {{ submission.test.title }} |
+        Marks: {{ submission.marks or "Not graded" }} |
+        Graded by: {{ submission.grader.name if submission.grader else "N/A" }}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add Question to {{ test.title }}</h1>
+
+<form method="POST">
+    <label>Question:</label><br>
+    <textarea name="question_text"></textarea><br><br>
+
+    <label>Type:</label>
+    <select name="type">
+        <option value="open">Open Ended</option>
+    </select><br><br>
+
+    <button type="submit">Add Question</button>
+</form>
+
+{% endblock %}

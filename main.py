@@ -59,6 +59,93 @@ def tests():
     return render_template("tests.html", tests=all_tests)
 
 
+@app.route("/test/<int:test_id>/add_question", methods=["GET", "POST"])
+def add_question(test_id):
+    test = Test.query.get_or_404(test_id)
+
+    if request.method == "POST":
+        question_text = request.form["question_text"]
+        q_type = request.form["type"]
+
+        question = Question(
+            test_id=test_id,
+            question_text=question_text,
+            type=q_type
+        )
+
+        db.session.add(question)
+        db.session.commit()
+
+        return redirect("/tests")
+
+    return render_template("add_question.html", test=test)
+
+
+@app.route("/test/<int:test_id>")
+def test_details(test_id):
+    test = Test.query.get_or_404(test_id)
+    return render_template("test_details.html", test=test)
+
+
+@app.route("/test/<int:test_id>", methods=["GET", "POST"])
+def take_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    students = User.query.filter_by(role="student").all()
+
+    # Check if POST (student submitting answers)
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+
+        # Check if this student already submitted
+        existing = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
+        if existing:
+            return "Student has already submitted this test!"
+
+        # Create submission
+        submission = Submission(test_id=test.id, student_id=student_id)
+        db.session.add(submission)
+        db.session.commit()
+
+        # Save each answer
+        for question in test.questions:
+            answer_text = request.form.get(f"question_{question.id}", "")
+            answer = Answer(submission_id=submission.id, question_id=question.id, answer_text=answer_text)
+            db.session.add(answer)
+
+        db.session.commit()
+        return redirect("/tests")
+
+    # GET request => show the test
+    return render_template("take_test.html", test=test, students=students)
+
+
+@app.route("/test/<int:test_id>/submissions")
+def view_submissions(test_id):
+    test = Test.query.get_or_404(test_id)
+    submissions = Submission.query.filter_by(test_id=test.id).all()
+    return render_template("submissions.html", test=test, submissions=submissions)
+
+
+@app.route("/submission/<int:submission_id>/grade", methods=["GET", "POST"])
+def grade_submission(submission_id):
+    submission = Submission.query.get_or_404(submission_id)
+    teachers = User.query.filter_by(role="teacher").all()
+
+    if request.method == "POST":
+        submission.marks = request.form["marks"]
+        submission.graded_by = request.form["teacher_id"]
+        db.session.commit()
+        return redirect(f"/test/{submission.test_id}/submissions")
+
+    return render_template("grade_submission.html", submission=submission, teachers=teachers)
+
+
+@app.route("/student/<int:student_id>/results")
+def student_results(student_id):
+    student = User.query.get_or_404(student_id)
+    submissions = Submission.query.filter_by(student_id=student.id).all()
+    return render_template("student_results.html", student=student, submissions=submissions)
+
 # ----------
 # Run server
 # ----------
