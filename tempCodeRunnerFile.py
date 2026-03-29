@@ -124,6 +124,12 @@ def view_submissions(test_id):
     submissions = Submission.query.filter_by(test_id=test.id).all()
     return render_template("submissions.html", test=test, submissions=submissions)
 
+@app.route("/test/<int:test_id>/submissions")
+def view_submissions(test_id):
+    test = Test.query.get_or_404(test_id)
+    submissions = Submission.query.filter_by(test_id=test.id).all()
+    return render_template("submissions.html", test=test, submissions=submissions)
+
 
 @app.route("/submission/<int:submission_id>/grade", methods=["GET", "POST"])
 def grade_submission(submission_id):

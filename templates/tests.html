@@ -7,14 +7,13 @@
     {% for test in tests %}
     <li>
         <strong>
-            <a href="/test/{{ test.id }}">
-                {{ test.title }}
-            </a>
+            <a href="/test/{{ test.id }}">{{ test.title }}</a>
         </strong>
         <br>
         Created by: {{ test.teacher.name }}
         <br>
-        <a href="/test/{{ test.id }}/add_question">Add Questions</a>
+        <a href="/test/{{ test.id }}/add_question">Add Questions</a> |
+        <a href="/test/{{ test.id }}/submissions">View Submissions</a>
     </li>
     {% endfor %}
 </ul>
