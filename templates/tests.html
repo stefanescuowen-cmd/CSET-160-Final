@@ -5,7 +5,16 @@
 
 <ul>
     {% for test in tests %}
-        <li>{{ test.title }} (Created by: {{ test.teacher.name }})</li>
+    <li>
+        <strong>{{ test.title }}</strong> (Created by: {{ test.teacher.name }})
+        <br>
+        <a href="/test/{{ test.id }}/edit">Edit Test</a> |
+        <a href="/test/{{ test.id }}">Take Test</a> |
+        <a href="/test/{{ test.id }}/submissions">View Submissions</a>
+        <form method="POST" action="/test/{{ test.id }}/delete" style="display:inline">
+            <button type="submit">Delete Test</button>
+        </form>
+    </li>
     {% endfor %}
 </ul>
 
