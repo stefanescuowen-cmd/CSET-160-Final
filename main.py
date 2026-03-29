@@ -11,6 +11,10 @@ db.init_app(app)
 # Routes
 # ------
 
+# ----------------------- 
+# Registration & Accounts
+# -----------------------
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -36,16 +40,18 @@ def accounts():
     return render_template("accounts.html", users=users)
 
 
+# --------------- 
+# Test Management
+# ---------------
+
 @app.route("/create_test", methods=["GET", "POST"])
 def create_test():
     teachers = User.query.filter_by(role="teacher").all()
     if request.method == "POST":
         title = request.form["title"]
         teacher_id = request.form["teacher_id"]
-        is_timed = bool(request.form.get("is_timed"))
-        duration = request.form.get("duration") or None
 
-        test = Test(title=title, teacher_id=teacher_id, is_timed=is_timed, duration=duration)
+        test = Test(title=title, teacher_id=teacher_id)
         db.session.add(test)
         db.session.commit()
         return redirect("/tests")
@@ -59,32 +65,18 @@ def tests():
     return render_template("tests.html", tests=all_tests)
 
 
-@app.route("/test/<int:test_id>/add_question", methods=["GET", "POST"])
+@app.route("/test/<int:test_id>/add_question", methods=["POST"])
 def add_question(test_id):
     test = Test.query.get_or_404(test_id)
 
-    if request.method == "POST":
-        question_text = request.form["question_text"]
-        q_type = request.form["type"]
+    question_text = request.form["question_text"]
 
-        question = Question(
-            test_id=test_id,
-            question_text=question_text,
-            type=q_type
-        )
+    # All questions are open-ended
+    question = Question(test_id=test_id, question_text=question_text)
+    db.session.add(question)
+    db.session.commit()
 
-        db.session.add(question)
-        db.session.commit()
-
-        return redirect("/tests")
-
-    return render_template("add_question.html", test=test)
-
-
-@app.route("/test/<int:test_id>")
-def test_details(test_id):
-    test = Test.query.get_or_404(test_id)
-    return render_template("test_details.html", test=test)
+    return redirect(f"/test/{test_id}/edit")
 
 
 @app.route("/test/<int:test_id>", methods=["GET", "POST"])
@@ -92,31 +84,60 @@ def take_test(test_id):
     test = Test.query.get_or_404(test_id)
     students = User.query.filter_by(role="student").all()
 
-    # Check if POST (student submitting answers)
     if request.method == "POST":
-        student_id = request.form["student_id"]
+        # Validate student selection
+        try:
+            student_id = int(request.form["student_id"])
+        except ValueError:
+            return "Invalid student selection!"
 
-        # Check if this student already submitted
+        student = User.query.filter_by(id=student_id, role="student").first()
+        if not student:
+            return "Selected user is not a valid student!"
+
+        # Prevent multiple submissions
         existing = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
         if existing:
-            return "Student has already submitted this test!"
+            return "You have already submitted this test!"
 
         # Create submission
         submission = Submission(test_id=test.id, student_id=student_id)
         db.session.add(submission)
         db.session.commit()
 
-        # Save each answer
+        # Save answers
         for question in test.questions:
             answer_text = request.form.get(f"question_{question.id}", "")
             answer = Answer(submission_id=submission.id, question_id=question.id, answer_text=answer_text)
             db.session.add(answer)
+        db.session.commit()
 
+        return redirect("/tests")
+
+    return render_template("take_test.html", test=test, students=students)
+
+
+@app.route("/test/<int:test_id>/edit", methods=["GET", "POST"])
+def edit_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    teachers = User.query.filter_by(role="teacher").all()
+
+    if request.method == "POST":
+        test.title = request.form["title"]
+        test.teacher_id = request.form["teacher_id"]
         db.session.commit()
         return redirect("/tests")
 
-    # GET request => show the test
-    return render_template("take_test.html", test=test, students=students)
+    return render_template("edit_test.html", test=test, teachers=teachers)
+
+
+@app.route("/test/<int:test_id>/delete", methods=["POST"])
+def delete_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    db.session.delete(test)
+    db.session.commit()
+    return redirect("/tests")
+
 
 @app.route("/test/<int:test_id>/submissions")
 def view_submissions(test_id):
@@ -124,6 +145,29 @@ def view_submissions(test_id):
     submissions = Submission.query.filter_by(test_id=test.id).all()
     return render_template("submissions.html", test=test, submissions=submissions)
 
+
+@app.route("/question/<int:question_id>/edit", methods=["GET", "POST"])
+def edit_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    if request.method == "POST":
+        question.question_text = request.form["question_text"]
+        db.session.commit()
+        return redirect(f"/test/{question.test_id}/edit")
+    return render_template("edit_question.html", question=question)
+
+
+@app.route("/question/<int:question_id>/delete", methods=["POST"])
+def delete_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    test_id = question.test_id
+    db.session.delete(question)
+    db.session.commit()
+    return redirect(f"/test/{test_id}/edit")
+
+
+# -----------------
+# Grading & Results
+# -----------------
 
 @app.route("/submission/<int:submission_id>/grade", methods=["GET", "POST"])
 def grade_submission(submission_id):
@@ -144,6 +188,32 @@ def student_results(student_id):
     student = User.query.get_or_404(student_id)
     submissions = Submission.query.filter_by(student_id=student.id).all()
     return render_template("student_results.html", student=student, submissions=submissions)
+
+
+@app.route("/tests/summary")
+def tests_summary():
+    tests = Test.query.all()
+
+    tests_info = []
+    for t in tests:
+        student_count = Submission.query.filter_by(test_id=t.id).count()
+
+        tests_info.append({
+            "id": t.id,
+            "title": t.title,
+            "teacher": t.teacher.name,
+            "student_count": student_count
+        })
+
+    return render_template("tests_summary.html", tests=tests_info)
+
+
+@app.route("/test/<int:test_id>/summary")
+def test_summary(test_id):
+    test = Test.query.get_or_404(test_id)
+    submissions = Submission.query.filter_by(test_id=test.id).all()
+
+    return render_template("test_summary.html", test=test, submissions=submissions)
 
 # ----------
 # Run server

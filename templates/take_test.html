@@ -16,8 +16,8 @@
 
     {% for question in test.questions %}
     <div>
-        <label>{{ loop.index }}. {{ question.question_text }}</label>
-        <input type="text" name="question_{{ question.id }}">
+        <label>{{ loop.index }}. {{ question.question_text }}</label><br>
+        <textarea name="question_{{ question.id }}" rows="3" cols="50"></textarea>
     </div>
     <br>
     {% endfor %}

@@ -1,15 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ student.name }} - Test Results</h1>
+<h1>Results for {{ student.name }}</h1>
 
-<ul>
-    {% for submission in submissions %}
-    <li>
-        Test: {{ submission.test.title }} |
-        Marks: {{ submission.marks or "Not graded" }} |
-        Graded by: {{ submission.grader.name if submission.grader else "N/A" }}
-    </li>
-    {% endfor %}
-</ul>
+{% if submissions %}
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Test Title</th>
+            <th>Marks Achieved</th>
+            <th>Graded By (Teacher)</th>
+            <th>Submission Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for submission in submissions %}
+        <tr>
+            <td>{{ submission.test.title }}</td>
+            <td>{{ submission.marks or "Not graded yet" }}</td>
+            <td>
+                {% if submission.grader %}
+                    {{ submission.grader.name }}
+                {% else %}
+                    Not graded yet
+                {% endif %}
+            </td>
+            <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>This student has not taken any tests yet.</p>
+{% endif %}
+
+<a href="/accounts">Back to Accounts</a>
 {% endblock %}

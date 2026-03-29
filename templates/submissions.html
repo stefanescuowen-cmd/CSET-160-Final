@@ -7,8 +7,10 @@
     {% for submission in submissions %}
     <li>
         Student: {{ submission.student.name }} |
-        Marks: {{ submission.marks or "Not graded" }} |
-        <a href="/submission/{{ submission.id }}/grade">Grade</a>
+        Marks: {{ submission.marks or "Not graded" }} 
+        {% if submission.test.teacher_id != submission.graded_by %}
+            | <a href="/submission/{{ submission.id }}/grade">Grade</a>
+        {% endif %}
         <br>
         Answers:
         <ul>
