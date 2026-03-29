@@ -213,7 +213,11 @@ def test_summary(test_id):
     test = Test.query.get_or_404(test_id)
     submissions = Submission.query.filter_by(test_id=test.id).all()
 
-    return render_template("test_summary.html", test=test, submissions=submissions)
+    return render_template(
+        "test_summary.html",
+        test=test,
+        submissions=submissions
+    )
 
 # ----------
 # Run server

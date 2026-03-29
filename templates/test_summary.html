@@ -15,7 +15,11 @@
     {% for submission in submissions %}
     <tr>
         <td>{{ submission.student.name }}</td>
-        <td>{{ submission.marks or "Not graded" }}</td>
+
+        <td>
+            {{ submission.marks if submission.marks else "Not graded" }}
+        </td>
+
         <td>
             {% if submission.graded_by %}
                 {{ submission.grader.name }}
