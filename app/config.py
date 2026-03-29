@@ -1,17 +1,8 @@
-# Please enter password for the
-# following service:
-# Service: Mysql@localhost:3306
-# User: root
+import os
 
-# Password:
-
-# Save password in vault
-
-# OK
-
-# Cancel
 class Config:
-    SECRET_KEY = "Al1baba64"
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:Stevens2023!@localhost/exam_platform"
+    SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret")
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URI", "sqlite:///local.db"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
