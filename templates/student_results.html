@@ -16,8 +16,20 @@
     <tbody>
         {% for submission in submissions %}
         <tr>
-            <td>{{ submission.test.title }}</td>
-            <td>{{ submission.marks or "Not graded yet" }}</td>
+            <td>
+                <a href="/test/{{ submission.test.id }}/summary">
+                    {{ submission.test.title }}
+                </a>
+            </td>
+
+            <td>
+                {% if submission.marks is not none %}
+                    {{ submission.marks }}
+                {% else %}
+                    Not graded yet
+                {% endif %}
+            </td>
+
             <td>
                 {% if submission.grader %}
                     {{ submission.grader.name }}
@@ -25,7 +37,14 @@
                     Not graded yet
                 {% endif %}
             </td>
-            <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+
+            <td>
+                {% if submission.submitted_at %}
+                    {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
