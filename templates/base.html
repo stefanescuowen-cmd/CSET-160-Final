@@ -2,28 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Platform</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        nav a {
+            color: #334155;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 400;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #2563eb;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            max-width: 900px;
+            margin: auto;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        /* Button styling */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .img {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Exam Platform</h1>
-        <nav>
-            <a href="/register">Register</a> |
-            <a href="/accounts">Accounts</a> |
-            <a href="/tests">Tests</a> |
-            <a href="/tests/summary">Tests Summary</a> |
-            <a href="/create_test">Create Test</a>
-        </nav>
-        <hr>
-    </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<header>
+        <img class="img" src="{{ url_for('static', filename='160FInal.png') }}" alt="Exam Platforms Logo">
+   <h1>Exam Platform</h1>
+</header>
+    <nav>
+        <a href="/register">Register</a>
+        <a href="/accounts">Accounts</a>
+        <a href="/tests">Tests</a>
+        <a href="/tests/summary">Summary</a>
+        <a href="/create_test">Create Test</a>
+    </nav>
+</header>
 
-    <footer>
-        <hr>
-        <p>© 2026 Exam Platform</p>
-    </footer>
+<main>
+    <div class="card">
+        {% block content %}
+        <h2>Welcome 👋</h2>
+        <br>
+        <a href="/tests" class="btn">View Tests</a>
+        {% endblock %}
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 Exam Platform</p>
+</footer>
+
 </body>
 </html>
