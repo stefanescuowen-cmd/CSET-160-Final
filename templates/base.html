@@ -38,17 +38,43 @@
             font-weight: 600;
         }
 
-        nav a {
-            color: #334155;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: 400;
-            transition: 0.3s;
-        }
+        
+        nav {
+    display: flex;
+    gap: 12px;
+}
 
-        nav a:hover {
-            color: #2563eb;
-        }
+nav a {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #0f172a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+/* Hover effect */
+nav a:hover {
+    background: #2563eb;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* Active (clicked) effect */
+nav a:active {
+    transform: scale(0.95);
+}
+
+nav a:last-child {
+    background: #2563eb;
+    color: white;
+}
+
+nav a:last-child:hover {
+    background: #1d4ed8;
+}
 
         main {
             flex: 1;
