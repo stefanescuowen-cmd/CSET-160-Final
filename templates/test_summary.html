@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ test.title }} - Detailed Results</h1>
+
+<p><strong>Created by:</strong> {{ test.teacher.name }}</p>
+
+<table border="1">
+    <tr>
+        <th>Student</th>
+        <th>Marks</th>
+        <th>Graded By</th>
+    </tr>
+
+    {% for submission in submissions %}
+    <tr>
+        <td>{{ submission.student.name }}</td>
+
+        <td>
+            {{ submission.marks if submission.marks else "Not graded" }}
+        </td>
+
+        <td>
+            {% if submission.graded_by %}
+                {{ submission.grader.name }}
+            {% else %}
+                Not graded
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/tests/summary">Back to Summary</a>
+{% endblock %}

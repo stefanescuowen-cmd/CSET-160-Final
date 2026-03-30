@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>All Tests</h1>
+
+<ul>
+    {% for test in tests %}
+    <li>
+        <strong>{{ test.title }}</strong> (Created by: {{ test.teacher.name }})
+        <br>
+        <a href="/test/{{ test.id }}/edit">Edit Test</a> |
+        <a href="/test/{{ test.id }}">Take Test</a> |
+        <a href="/test/{{ test.id }}/submissions">View Submissions</a>
+        <form method="POST" action="/test/{{ test.id }}/delete" style="display:inline">
+            <button type="submit">Delete Test</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="/create_test">Create New Test</a>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Grade Submission</h1>
+<p>Student: {{ submission.student.name }}</p>
+<p>Test: {{ submission.test.title }}</p>
+
+<form method="POST">
+    <label for="marks">Marks:</label>
+    <input type="number" name="marks" value="{{ submission.marks or 0 }}" min="0">
+
+    <label for="teacher_id">Graded by:</label>
+    <select name="teacher_id" required>
+        {% for teacher in teachers %}
+        <option value="{{ teacher.id }}"
+        {% if submission.graded_by == teacher.id %}selected{% endif %}>
+            {{ teacher.name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Submit Grade</button>
+</form>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Test</h1>
+
+<!-- Edit Test Info -->
+<form method="POST">
+    <label for="title">Test Title:</label>
+    <input type="text" name="title" value="{{ test.title }}" required>
+    <br><br>
+
+    <label for="teacher_id">Assigned Teacher:</label>
+    <select name="teacher_id" required>
+        {% for teacher in teachers %}
+        <option value="{{ teacher.id }}" {% if test.teacher_id == teacher.id %}selected{% endif %}>
+            {{ teacher.name }}
+        </option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+</form>
+
+<hr>
+
+<!-- Questions Section -->
+<h2>Questions</h2>
+
+<ul>
+    {% for question in test.questions %}
+    <li>
+        {{ question.question_text }} ({{ question.type }})
+        <a href="/question/{{ question.id }}/edit">Edit</a>
+        <form method="POST" action="/question/{{ question.id }}/delete" style="display:inline">
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<h3>Add New Question</h3>
+<form method="POST" action="/test/{{ test.id }}/add_question">
+    <label>Question Text:</label>
+    <input type="text" name="question_text" required>
+    <label>Type:</label>
+    <select name="type">
+        <option value="open_ended">Open Ended</option>
+        <option value="mcq">MCQ</option>
+    </select>
+    <button type="submit">Add Question</button>
+</form>
+
+<br>
+<a href="/tests">Back to All Tests</a>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ test.title }}</h1>
+<p>Created by: {{ test.teacher.name }}</p>
+
+<form method="POST">
+    <label for="student_id">Select Student:</label>
+    <select name="student_id" required>
+        {% for student in students %}
+        <option value="{{ student.id }}">{{ student.name }}</option>
+        {% endfor %}
+    </select>
+
+    <hr>
+
+    {% for question in test.questions %}
+    <div>
+        <label>{{ loop.index }}. {{ question.question_text }}</label><br>
+        <textarea name="question_{{ question.id }}" rows="3" cols="50"></textarea>
+    </div>
+    <br>
+    {% endfor %}
+
+    <button type="submit">Submit Test</button>
+</form>
+{% endblock %}

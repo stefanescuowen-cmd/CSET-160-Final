@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Tests Summary</h1>
+
+<table border="1">
+    <tr>
+        <th>Test Title</th>
+        <th>Created By</th>
+        <th>Students Taken</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for test in tests %}
+    <tr>
+        <td>{{ test.title }}</td>
+        <td>{{ test.teacher }}</td>
+        <td>{{ test.student_count }}</td>
+        <td>
+            <a href="/test/{{ test.id }}/summary">View Details</a> |
+            <a href="/test/{{ test.id }}/edit">Edit</a>
+            <form method="POST" action="/test/{{ test.id }}/delete" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

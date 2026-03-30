@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Results for {{ student.name }}</h1>
+
+{% if submissions %}
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Test Title</th>
+            <th>Marks Achieved</th>
+            <th>Graded By (Teacher)</th>
+            <th>Submission Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for submission in submissions %}
+        <tr>
+            <td>
+                <a href="/test/{{ submission.test.id }}/summary">
+                    {{ submission.test.title }}
+                </a>
+            </td>
+
+            <td>
+                {% if submission.marks is not none %}
+                    {{ submission.marks }}
+                {% else %}
+                    Not graded yet
+                {% endif %}
+            </td>
+
+            <td>
+                {% if submission.grader %}
+                    {{ submission.grader.name }}
+                {% else %}
+                    Not graded yet
+                {% endif %}
+            </td>
+
+            <td>
+                {% if submission.submitted_at %}
+                    {{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>This student has not taken any tests yet.</p>
+{% endif %}
+
+<a href="/accounts">Back to Accounts</a>
+{% endblock %}
