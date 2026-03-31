@@ -1,35 +1,131 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ test.title }} - Detailed Results</h1>
+<style>
+    .results-card {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
 
-<p><strong>Created by:</strong> {{ test.teacher.name }}</p>
+    .header-section {
+        border-bottom: 2px solid #f0f2f5;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
 
-<table border="1">
-    <tr>
-        <th>Student</th>
-        <th>Marks</th>
-        <th>Graded By</th>
-    </tr>
+    h1 {
+        color: #1a202c;
+        margin: 0 0 5px 0;
+        font-size: 1.5rem;
+    }
 
-    {% for submission in submissions %}
-    <tr>
-        <td>{{ submission.student.name }}</td>
+    .meta-info {
+        color: #718096;
+        font-size: 0.95rem;
+    }
 
-        <td>
-            {{ submission.marks if submission.marks else "Not graded" }}
-        </td>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        overflow: hidden;
+        border-radius: 8px;
+    }
 
-        <td>
-            {% if submission.graded_by %}
-                {{ submission.grader.name }}
-            {% else %}
-                Not graded
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    th {
+        background-color: #f8fafc;
+        color: #4a5568;
+        font-weight: 600;
+        text-align: left;
+        padding: 14px 16px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
 
-<a href="/tests/summary">Back to Summary</a>
+    td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #edf2f7;
+        color: #2d3748;
+        font-size: 0.95rem;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-graded { background: #e6fffa; color: #234e52; }
+    .status-pending { background: #fff5f5; color: #9b2c2c; font-style: italic; }
+
+    .back-btn {
+        display: inline-block;
+        margin-top: 25px;
+        text-decoration: none;
+        color: #4a90e2;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .back-btn:hover {
+        color: #2b6cb0;
+        text-decoration: underline;
+    }
+</style>
+
+<div class="results-card">
+    <div class="header-section">
+        <h1>{{ test.title }}</h1>
+        <p class="meta-info">Created by <strong>{{ test.teacher.name }}</strong></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Marks</th>
+                <th>Graded By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            <tr>
+                <td>{{ submission.student.name }}</td>
+                <td>
+                    {% if submission.marks %}
+                        <span class="status-badge status-graded">{{ submission.marks }}</span>
+                    {% else %}
+                        <span class="status-badge status-pending">Not graded</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if submission.graded_by %}
+                        {{ submission.grader.name }}
+                    {% else %}
+                        <span style="color: #a0aec0;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/tests/summary" class="back-btn">← Back to Summary</a>
+</div>
 {% endblock %}

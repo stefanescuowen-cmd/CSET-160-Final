@@ -1,30 +1,138 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Tests Summary</h1>
+<style>
+    .summary-card {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
 
-<table border="1">
-    <tr>
-        <th>Test Title</th>
-        <th>Created By</th>
-        <th>Students Taken</th>
-        <th>Actions</th>
-    </tr>
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 
-    {% for test in tests %}
-    <tr>
-        <td>{{ test.title }}</td>
-        <td>{{ test.teacher }}</td>
-        <td>{{ test.student_count }}</td>
-        <td>
-            <a href="/test/{{ test.id }}/summary">View Details</a> |
-            <a href="/test/{{ test.id }}/edit">Edit</a>
-            <form method="POST" action="/test/{{ test.id }}/delete" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    h1 {
+        color: #1a202c;
+        font-size: 1.6rem;
+        margin: 0;
+    }
 
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        text-align: left;
+        padding: 16px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+    }
+
+    tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Action Links & Buttons */
+    .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-link {
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #4a90e2;
+        transition: color 0.2s;
+    }
+
+    .btn-link:hover {
+        color: #2b6cb0;
+        text-decoration: underline;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+    .count-badge {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="summary-card">
+    <div class="table-header">
+        <h1>Tests Summary</h1>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Test Title</th>
+                <th>Created By</th>
+                <th>Students</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for test in tests %}
+            <tr>
+                <td style="font-weight: 600;">{{ test.title }}</td>
+                <td>{{ test.teacher }}</td>
+                <td><span class="count-badge">{{ test.student_count }}</span></td>
+                <td>
+                    <div class="actions">
+                        <a href="/test/{{ test.id }}/summary" class="btn-link">View</a>
+                        <a href="/test/{{ test.id }}/edit" class="btn-link">Edit</a>
+                        <form method="POST" action="/test/{{ test.id }}/delete" style="margin:0;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
