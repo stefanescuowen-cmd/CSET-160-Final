@@ -17,7 +17,16 @@
     {% for question in test.questions %}
     <div>
         <label>{{ loop.index }}. {{ question.question_text }}</label><br>
-        <textarea name="question_{{ question.id }}" rows="3" cols="50"></textarea>
+
+        {% if question.type == "mcq" %}
+            {% for option in question.options %}
+                <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
+                {{ option.text }}<br>
+            {% endfor %}
+        {% else %}
+            <textarea name="question_{{ question.id }}" rows="3" cols="50"></textarea>
+        {% endif %}
+
     </div>
     <br>
     {% endfor %}

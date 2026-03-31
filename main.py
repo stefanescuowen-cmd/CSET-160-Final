@@ -8,9 +8,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
-# ------
+
 # Routes
-# ------
 
 # ----------------------- 
 # Registration & Accounts
@@ -34,10 +33,18 @@ def register():
 @app.route("/accounts")
 def accounts():
     role_filter = request.args.get("role")
+    sort_by = request.args.get("sort")
+
+    users_query = User.query
     if role_filter in ("student", "teacher"):
-        users = User.query.filter_by(role=role_filter).all()
-    else:
-        users = User.query.all()
+        users_query = users_query.filter_by(role=role_filter)
+
+    if sort_by == "name":
+        users_query = users_query.order_by(User.name)
+    elif sort_by == "date":
+        users_query = users_query.order_by(User.created_at)
+
+    users = users_query.all()
     return render_template("accounts.html", users=users)
 
 
@@ -55,6 +62,11 @@ def create_test():
         test = Test(title=title, teacher_id=teacher_id)
         db.session.add(test)
         db.session.commit()
+
+        time_limit = request.form.get("time_limit")
+        time_limit = int(time_limit) if time_limit else None
+        test = Test(title=title, teacher_id=teacher_id, time_limit=time_limit)
+
         return redirect("/tests")
 
     return render_template("create_test.html", teachers=teachers)
@@ -73,7 +85,8 @@ def add_question(test_id):
     question_text = request.form["question_text"]
 
     # All questions are open-ended
-    question = Question(test_id=test_id, question_text=question_text)
+    question_type = request.form.get("type", "open_ended")
+    question = Question(test_id=test_id, question_text=question_text, type=question_type)
     db.session.add(question)
     db.session.commit()
 
@@ -100,6 +113,10 @@ def take_test(test_id):
         existing = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
         if existing:
             return "You have already submitted this test!"
+
+        # Optional: Check for timed test
+        # start_time could be stored in session or hidden field
+        # If timed, check elapsed time here (extra feature)
 
         # Create submission
         submission = Submission(test_id=test.id, student_id=student_id)
@@ -219,6 +236,8 @@ def test_summary(test_id):
         test=test,
         submissions=submissions
     )
+
+
 
 # ----------
 # Run server
