@@ -1,20 +1,137 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Edit Question</h1>
+<style>
+    /* Container & Layout */
+    .edit-container {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
 
-<form method="POST">
-    <label>Question Text:</label>
-    <input type="text" name="question_text" value="{{ question.question_text }}" required>
-    <br><br>
-    <label>Type:</label>
-    <select name="type">
-        <option value="open_ended" {% if question.type == "open_ended" %}selected{% endif %}>Open Ended</option>
-        <option value="mcq" {% if question.type == "mcq" %}selected{% endif %}>MCQ</option>
-    </select>
-    <br><br>
-    <button type="submit">Save Changes</button>
-</form>
+    /* Back Link */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #4f46e5;
+        text-decoration: none;
+        margin-bottom: 1.5rem;
+        transition: color 0.2s;
+    }
+    .back-link:hover { color: #4338ca; }
 
-<a href="/test/{{ question.test_id }}/edit">Back to Edit Test</a>
+    /* Card Styling */
+    .form-card {
+        background: white;
+        border-radius: 1rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .card-header {
+        padding: 1.5rem 2rem;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .card-header h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    /* Form Fields */
+    .form-body { padding: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    
+    .label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .input-field, .select-field {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background-color: #f9fafb;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+    .input-field:focus, .select-field:focus {
+        outline: none;
+        background-color: white;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Action Buttons */
+    .form-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f3f4f6;
+    }
+    .btn-save {
+        padding: 0.75rem 2rem;
+        background-color: #4f46e5;
+        color: white;
+        font-weight: 700;
+        border-radius: 0.75rem;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.1s, background-color 0.2s;
+    }
+    .btn-save:hover { background-color: #4338ca; transform: translateY(-1px); }
+    .btn-save:active { transform: translateY(0); }
+    
+    .btn-cancel {
+        font-size: 0.875rem;
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+
+<div class="edit-container">
+    <a href="/test/{{ question.test_id }}/edit" class="back-link">
+        ← Back to Test Editor
+    </a>
+
+    <div class="form-card">
+        <div class="card-header">
+            <h1>Edit Question</h1>
+        </div>
+
+        <form method="POST" class="form-body">
+            <div class="form-group">
+                <label class="label">Question Text</label>
+                <textarea name="question_text" class="input-field" rows="3" required placeholder="Type your question here...">{{ question.question_text }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Response Type</label>
+                <select name="type" class="select-field">
+                    <option value="open_ended" {% if question.type == "open_ended" %}selected{% endif %}>Open Ended</option>
+                    <option value="mcq" {% if question.type == "mcq" %}selected{% endif %}>Multiple Choice (MCQ)</option>
+                </select>
+            </div>
+
+            <div class="form-footer">
+                <a href="/test/{{ question.test_id }}/edit" class="btn-cancel">Discard</a>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

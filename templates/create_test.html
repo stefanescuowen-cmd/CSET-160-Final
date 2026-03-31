@@ -1,23 +1,100 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Create Test</h1>
 
-<form method="POST">
-    <label for="title">Title:</label>
-    <input type="text" name="title" required>
-    <br><br>
+<style>
+.form-container {
+    max-width: 500px;
+    margin: auto;
+}
 
-    <label for="teacher_id">Teacher:</label>
-    <select name="teacher_id" required>
-        {% for teacher in teachers %}
-        <option value="{{ teacher.id }}">{{ teacher.name }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
+.form-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
 
-    <button type="submit">Create Test</button>
-</form>
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
 
-<a href="/tests">Back to All Tests</a>
+label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #334155;
+}
+
+input, select {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.submit-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    color: #2563eb;
+}
+</style>
+
+<div class="form-container">
+    <div class="form-title">Create New Test 📝</div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="title">Test Title</label>
+            <input type="text" name="title" placeholder="Enter test name..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="teacher_id">Select Teacher</label>
+            <select name="teacher_id" required>
+                {% for teacher in teachers %}
+                <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="submit-btn">Create Test</button>
+    </form>
+
+    <a href="/tests" class="back-link">← Back to All Tests</a>
+</div>
+
 {% endblock %}

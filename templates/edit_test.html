@@ -1,56 +1,152 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Edit Test</h1>
+<style>
+    .edit-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
 
-<!-- Edit Test Info -->
-<form method="POST">
-    <label for="title">Test Title:</label>
-    <input type="text" name="title" value="{{ test.title }}" required>
-    <br><br>
+    .section {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
 
-    <label for="teacher_id">Assigned Teacher:</label>
-    <select name="teacher_id" required>
-        {% for teacher in teachers %}
-        <option value="{{ teacher.id }}" {% if test.teacher_id == teacher.id %}selected{% endif %}>
-            {{ teacher.name }}
-        </option>
-        {% endfor %}
-    </select>
-    <br><br>
+    .section:last-of-type { border-bottom: none; }
 
-    <button type="submit">Save Changes</button>
-</form>
+    h1, h2, h3 { color: #1a202c; margin-bottom: 20px; }
+    h1 { font-size: 1.75rem; border-bottom: 2px solid #4a90e2; display: inline-block; padding-bottom: 5px; }
+    h2 { font-size: 1.4rem; margin-top: 10px; }
+    h3 { font-size: 1.1rem; color: #4a5568; }
 
-<hr>
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 0.9rem; }
 
-<!-- Questions Section -->
-<h2>Questions</h2>
+    input[type="text"], select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
 
-<ul>
-    {% for question in test.questions %}
-    <li>
-        {{ question.question_text }} ({{ question.type }})
-        <a href="/question/{{ question.id }}/edit">Edit</a>
-        <form method="POST" action="/question/{{ question.id }}/delete" style="display:inline">
-            <button type="submit">Delete</button>
+    input:focus, select:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-primary { background: #4a90e2; color: white; }
+    .btn-primary:hover { background: #357abd; }
+
+    .btn-add { background: #10b981; color: white; margin-top: 10px; }
+    .btn-add:hover { background: #059669; }
+
+    .btn-delete { background: #fee2e2; color: #dc2626; padding: 6px 12px; font-size: 0.85rem; }
+    .btn-delete:hover { background: #fecaca; }
+
+    .question-list { list-style: none; padding: 0; }
+    .question-item {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #edf2f7;
+    }
+
+    .question-text { font-weight: 500; color: #2d3748; }
+    .question-type {
+        font-size: 0.75rem;
+        background: #e2e8f0;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-left: 10px;
+        text-transform: uppercase;
+    }
+
+    .back-link { display: inline-block; margin-top: 20px; color: #718096; text-decoration: none; font-weight: 500; }
+    .back-link:hover { color: #4a5568; }
+</style>
+
+<div class="edit-container">
+    <div class="section">
+        <h1>Edit Test</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label>Test Title</label>
+                <input type="text" name="title" value="{{ test.title }}" required>
+            </div>
+            <div class="form-group">
+                <label>Assigned Teacher</label>
+                <select name="teacher_id" required>
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}" {% if test.teacher_id == teacher.id %}selected{% endif %}>
+                        {{ teacher.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save General Info</button>
         </form>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
 
-<h3>Add New Question</h3>
-<form method="POST" action="/test/{{ test.id }}/add_question">
-    <label>Question Text:</label>
-    <input type="text" name="question_text" required>
-    <label>Type:</label>
-    <select name="type">
-        <option value="open_ended">Open Ended</option>
-        <option value="mcq">MCQ</option>
-    </select>
-    <button type="submit">Add Question</button>
-</form>
+    <div class="section">
+        <h2>Questions</h2>
+        <ul class="question-list">
+            {% for question in test.questions %}
+            <li class="question-item">
+                <div>
+                    <span class="question-text">{{ question.question_text }}</span>
+                    <span class="question-type">{{ question.type }}</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <a href="/question/{{ question.id }}/edit" style="color: #4a90e2; font-size: 0.9rem; font-weight: 600; text-decoration: none;">Edit</a>
+                    <form method="POST" action="/question/{{ question.id }}/delete" style="margin:0">
+                        <button type="submit" class="btn btn-delete" onclick="return confirm('Delete this question?')">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-<br>
-<a href="/tests">Back to All Tests</a>
+    <div class="section">
+        <h3>Add New Question</h3>
+        <form method="POST" action="/test/{{ test.id }}/add_question">
+            <div class="form-group">
+                <label>Question Text</label>
+                <input type="text" name="question_text" placeholder="e.g., What is the capital of France?" required>
+            </div>
+            <div class="form-group">
+                <label>Question Type</label>
+                <select name="type">
+                    <option value="open_ended">Open Ended</option>
+                    <option value="mcq">MCQ</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-add">+ Add Question</button>
+        </form>
+    </div>
+
+    <a href="/tests" class="back-link">← Back to All Tests</a>
+</div>
 {% endblock %}

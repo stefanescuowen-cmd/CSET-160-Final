@@ -1,21 +1,167 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>All Users</h1>
+<style>
+    /* Container & Layout */
+    .manage-container {
+        max-width: 1100px;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
 
-<form method="GET" action="/accounts">
-    <label>Filter by Role:</label>
-    <select name="role">
-        <option value="">All</option>
-        <option value="student">Student</option>
-        <option value="teacher">Teacher</option>
-    </select>
-    <button type="submit">Filter</button>
-</form>
+    /* Header Section */
+    .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+        gap: 1.5rem;
+    }
+    .header-title h1 {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 0 0.25rem 0;
+    }
+    .header-title p {
+        color: #6b7280;
+        margin: 0;
+    }
 
-<ul>
-    {% for user in users %}
-        <li>{{ user.name }} ({{ user.email }}) - {{ user.role }}</li>
-    {% endfor %}
-</ul>
+    /* Filter Form */
+    .filter-form {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    .filter-select {
+        padding: 0.625rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        background-color: white;
+        font-size: 0.875rem;
+        transition: border-color 0.2s;
+    }
+    .filter-select:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+    .btn-filter {
+        padding: 0.625rem 1.25rem;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .btn-filter:hover { background-color: #1d4ed8; }
+
+    /* Table Styling */
+    .table-card {
+        background: white;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .user-table thead {
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .user-table th {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+    }
+    .user-table td {
+        padding: 1rem 1.5rem;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .user-table tr:last-child td { border-bottom: none; }
+    .user-table tr:hover { background-color: #f9fafb; }
+
+    .user-name { font-weight: 600; color: #111827; }
+    .user-email { color: #4b5563; }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.625rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    .badge-teacher { background-color: #f3e8ff; color: #6b21a8; }
+    .badge-student { background-color: #dbeafe; color: #1e40af; }
+    
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #9ca3af;
+        font-style: italic;
+    }
+</style>
+
+<div class="manage-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>User Management</h1>
+            <p>Manage and filter all registered accounts.</p>
+        </div>
+
+        <form method="GET" action="/accounts" class="filter-form">
+            <select name="role" class="filter-select">
+                <option value="">All Roles</option>
+                <option value="student" {% if request.args.get('role') == 'student' %}selected{% endif %}>Student</option>
+                <option value="teacher" {% if request.args.get('role') == 'teacher' %}selected{% endif %}>Teacher</option>
+            </select>
+            <button type="submit" class="btn-filter">Filter</button>
+        </form>
+    </header>
+
+    <div class="table-card">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td class="user-name">{{ user.name }}</td>
+                    <td class="user-email">{{ user.email }}</td>
+                    <td>
+                        <span class="badge {% if user.role == 'teacher' %}badge-teacher{% else %}badge-student{% endif %}">
+                            {{ user.role }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="empty-state">No users found matching your criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
