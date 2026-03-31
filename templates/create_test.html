@@ -13,7 +13,7 @@
     font-weight: 600;
     margin-bottom: 20px;
 }
-
+ 
 .form-group {
     margin-bottom: 20px;
     display: flex;
@@ -96,5 +96,11 @@ input:focus, select:focus {
 
     <a href="/tests" class="back-link">← Back to All Tests</a>
 </div>
+    <label for="time_limit">Time Limit (minutes, leave empty for unlimited):</label>
+    <input type="number" name="time_limit" min="1" placeholder="Unlimited">
+    <br><br>
+
+    <button type="submit">Create Test</button>
+</form>
 
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <style>
     /* Container & Layout */
     .manage-container {
@@ -164,4 +165,30 @@
         </table>
     </div>
 </div>
+<h1>All Users</h1>
+
+<form method="GET" action="/accounts">
+    <label>Filter by Role:</label>
+    <select name="role">
+        <option value="">All</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+    </select>
+
+    <label>Sort by:</label>
+    <select name="sort">
+        <option value="">None</option>
+        <option value="name">Name</option>
+        <option value="date">Date Created</option>
+    </select>
+
+    <button type="submit">Apply</button>
+</form>
+
+<ul>
+    {% for user in users %}
+        <li>{{ user.name }} ({{ user.email }}) - {{ user.role }}</li>
+    {% endfor %}
+</ul>
+
 {% endblock %}
