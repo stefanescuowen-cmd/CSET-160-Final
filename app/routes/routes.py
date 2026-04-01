@@ -244,7 +244,6 @@ def grade_submission(submission_id):
 # Test Summaries
 # -----------------------
 @bp.route("/tests/summary")
-@bp.route("/tests/summary")
 def tests_summary():
     tests = Test.query.all()
     tests_info = []
@@ -253,7 +252,7 @@ def tests_summary():
         tests_info.append({
             "id": t.id,
             "title": t.title,
-            "teacher": t.teacher.name if t.teacher else "N/A",
+            "teacher": t.teacher,  # pass the whole teacher object
             "student_count": student_count
         })
     return render_template("tests_summary.html", tests=tests_info)
