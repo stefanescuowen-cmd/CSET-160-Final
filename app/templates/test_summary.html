@@ -2,130 +2,137 @@
 
 {% block content %}
 <style>
-    .results-card {
-        max-width: 900px;
+    .summary-card {
+        max-width: 1000px;
         margin: 40px auto;
         padding: 25px;
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        font-family: 'Inter', -apple-system, sans-serif;
     }
 
-    .header-section {
-        border-bottom: 2px solid #f0f2f5;
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
-        padding-bottom: 15px;
     }
 
     h1 {
         color: #1a202c;
-        margin: 0 0 5px 0;
-        font-size: 1.5rem;
-    }
-
-    .meta-info {
-        color: #718096;
-        font-size: 0.95rem;
+        font-size: 1.6rem;
+        margin: 0;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
-        overflow: hidden;
         border-radius: 8px;
+        overflow: hidden;
     }
 
     th {
         background-color: #f8fafc;
-        color: #4a5568;
+        color: #64748b;
         font-weight: 600;
         text-align: left;
-        padding: 14px 16px;
+        padding: 16px;
+        font-size: 0.85rem;
         text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.025em;
+        border-bottom: 2px solid #e2e8f0;
     }
 
     td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #edf2f7;
-        color: #2d3748;
-        font-size: 0.95rem;
-    }
-
-    tr:last-child td {
-        border-bottom: none;
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
     }
 
     tr:hover {
-        background-color: #f1f5f9;
+        background-color: #f8fafc;
     }
 
-    .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
+    .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
-    .status-graded { background: #e6fffa; color: #234e52; }
-    .status-pending { background: #fff5f5; color: #9b2c2c; font-style: italic; }
-
-    .back-btn {
-        display: inline-block;
-        margin-top: 25px;
+    .btn-link {
         text-decoration: none;
-        color: #4a90e2;
+        font-size: 0.9rem;
         font-weight: 500;
+        color: #4a90e2;
         transition: color 0.2s;
     }
 
-    .back-btn:hover {
+    .btn-link:hover {
         color: #2b6cb0;
         text-decoration: underline;
     }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+    .count-badge {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
 </style>
 
-<div class="results-card">
-    <div class="header-section">
-        <h1>{{ test.title }}</h1>
-        <p class="meta-info">Created by <strong>{{ test.teacher.name }}</strong></p>
+<div class="summary-card">
+    <div class="table-header">
+        <h1>Tests Summary</h1>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Student</th>
-                <th>Marks</th>
-                <th>Graded By</th>
+                <th>Test Title</th>
+                <th>Created By</th>
+                <th>Students</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for submission in submissions %}
+            {% for test in tests %}
             <tr>
-                <td>{{ submission.student.name }}</td>
+                <td style="font-weight: 600;">{{ test.title }}</td>
+                <td>{{ test.teacher.name if test.teacher else "N/A" }}</td>
+                <td><span class="count-badge">{{ test.student_count }}</span></td>
                 <td>
-                    {% if submission.marks %}
-                        <span class="status-badge status-graded">{{ submission.marks }}</span>
-                    {% else %}
-                        <span class="status-badge status-pending">Not graded</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if submission.graded_by %}
-                        {{ submission.grader.name }}
-                    {% else %}
-                        <span style="color: #a0aec0;">—</span>
-                    {% endif %}
+                    <div class="actions">
+                        <!-- Correct link to test_summary -->
+                        <a href="{{ url_for('bp.test_summary', test_id=test.id) }}" class="btn-link">View</a>
+                        <a href="{{ url_for('bp.edit_test', test_id=test.id) }}" class="btn-link">Edit</a>
+                        <form method="POST" action="{{ url_for('bp.delete_test', test_id=test.id) }}" style="margin:0;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <a href="/tests/summary" class="back-btn">← Back to Summary</a>
 </div>
 {% endblock %}
