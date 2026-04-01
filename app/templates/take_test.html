@@ -39,7 +39,10 @@
             <select name="student_id" class="select-field" required>
                 <option value="" disabled selected>Choose a student...</option>
                 {% for student in students %}
-                <option value="{{ student.id }}">{{ student.name }}</option>
+                <option value="{{ student.id }}"
+                    {% if answers_dict and answers_dict.get('student_id') == student.id %}selected{% endif %}>
+                    {{ student.name }}
+                </option>
                 {% endfor %}
             </select>
         </div>
@@ -52,27 +55,34 @@
             </label>
 
             {% if question.type == "mcq" %}
-                <label><input type="radio" name="question_{{ question.id }}" value="A" required> {{ question.option_a }}</label><br>
-                <label><input type="radio" name="question_{{ question.id }}" value="B" required> {{ question.option_b }}</label><br>
-                <label><input type="radio" name="question_{{ question.id }}" value="C" required> {{ question.option_c }}</label><br>
-                <label><input type="radio" name="question_{{ question.id }}" value="D" required> {{ question.option_d }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="A"
+                    {% if answers_dict and answers_dict.get(question.id) == 'A' %}checked{% endif %}> {{ question.option_a }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="B"
+                    {% if answers_dict and answers_dict.get(question.id) == 'B' %}checked{% endif %}> {{ question.option_b }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="C"
+                    {% if answers_dict and answers_dict.get(question.id) == 'C' %}checked{% endif %}> {{ question.option_c }}</label><br>
+                <label><input type="radio" name="question_{{ question.id }}" value="D"
+                    {% if answers_dict and answers_dict.get(question.id) == 'D' %}checked{% endif %}> {{ question.option_d }}</label><br>
             {% else %}
-                <textarea name="question_{{ question.id }}" class="input-field" rows="4" placeholder="Type your response..." required></textarea>
+                <textarea name="question_{{ question.id }}" class="input-field" rows="4"
+                    placeholder="Type your response...">{% if answers_dict %}{{ answers_dict.get(question.id, '') }}{% endif %}</textarea>
             {% endif %}
         </div>
         {% endfor %}
 
-        <div class="submit-container">
-            <button type="submit" class="btn-submit">Submit Assessment</button>
+        <!-- Pagination + Submit -->
+        <div class="pagination" style="margin-top:20px; display:flex; gap:10px;">
+            {% if page > 1 %}
+            <button type="submit" name="next_page" value="prev">Previous Page</button>
+            {% endif %}
+
+            {% if page * 10 < total %}
+            <button type="submit" name="next_page" value="next">Next Page</button>
+            {% else %}
+            <button type="submit" name="submit_final" value="1">Submit Test</button>
+            {% endif %}
         </div>
     </form>
-
-    <!-- Pagination -->
-    <div class="pagination">
-        {% if page * 10 < total %}
-        <a href="{{ url_for('main.take_test', test_id=test.id, page=page+1) }}" class="btn-next">Next Page</a>
-        {% endif %}
-    </div>
 </div>
 
 {% if test.is_timed %}

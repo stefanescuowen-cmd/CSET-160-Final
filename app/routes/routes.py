@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, url_for
 from app.extensions import db
 from datetime import datetime, timedelta
 from app.models import User, Test, Question, Submission, Answer
@@ -129,58 +129,65 @@ def take_test(test_id):
     test = Test.query.get_or_404(test_id)
     students = User.query.filter_by(role="student").all()
 
+    # --- Pagination ---
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    questions = Question.query.filter_by(test_id=test.id)\
+        .offset((page - 1) * per_page)\
+        .limit(per_page).all()
+    total = Question.query.filter_by(test_id=test.id).count()
+
     if request.method == "POST":
-        # Safe student ID
         try:
             student_id = int(request.form.get("student_id"))
-        except (ValueError, TypeError):
+        except (TypeError, ValueError):
             return "Invalid student selection!"
 
-        student = User.query.filter_by(id=student_id, role="student").first()
-        if not student:
-            return "Selected user is not a valid student!"
+        # Find or create submission
+        submission = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
+        if not submission:
+            submission = Submission(test_id=test.id, student_id=student_id)
+            db.session.add(submission)
+            db.session.commit()
 
-        # Prevent duplicate submissions
-        existing = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
-        if existing:
-            return "You have already submitted this test!"
-
-        # --- TIMED TEST CHECK ---
-        is_late = False
-        if test.is_timed and test.duration:
-            start_time_str = request.form.get("start_time")
-            if start_time_str:
-                start_time = datetime.fromisoformat(start_time_str)
-                deadline = start_time + timedelta(minutes=test.duration)
-                if datetime.utcnow() > deadline:
-                    is_late = True
-
-        # Create submission
-        submission = Submission(
-            test_id=test.id,
-            student_id=student_id,
-            is_late=is_late
-        )
-        db.session.add(submission)
-        db.session.commit()
-
-        # Save answers
-        for question in test.questions:
+        # Save answers for this page
+        for question in questions:
             answer_text = request.form.get(f"question_{question.id}", "")
-            answer = Answer(submission_id=submission.id, question_id=question.id, answer_text=answer_text)
-            db.session.add(answer)
+            answer = Answer.query.filter_by(submission_id=submission.id, question_id=question.id).first()
+            if answer:
+                answer.answer_text = answer_text
+            else:
+                answer = Answer(submission_id=submission.id, question_id=question.id, answer_text=answer_text)
+                db.session.add(answer)
         db.session.commit()
 
-        return redirect("/tests")
+        # Handle pagination buttons
+        if request.form.get("next_page") == "next":
+            return redirect(url_for("main.take_test", test_id=test.id, page=page+1))
+        elif request.form.get("next_page") == "prev":
+            return redirect(url_for("main.take_test", test_id=test.id, page=page-1))
+        else:  # final submission
+            return redirect("/tests")
 
-    # --- GET REQUEST ---
+    # Pre-fill answers for student
+    answers_dict = {}
+    student_id = request.args.get("student_id", type=int)
+    if student_id:
+        submission = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
+        if submission:
+            answers_dict = {a.question_id: a.answer_text for a in submission.answers}
+            answers_dict['student_id'] = student_id  # keep student selection pre-filled
+
     return render_template(
         "take_test.html",
         test=test,
         students=students,
-        datetime=datetime  # pass to template for start_time
+        questions=questions,
+        page=page,
+        total=total,
+        answers_dict=answers_dict,
+        datetime=datetime
     )
-
 
 @bp.route("/test/<int:test_id>/edit", methods=["GET", "POST"])
 def edit_test(test_id):
