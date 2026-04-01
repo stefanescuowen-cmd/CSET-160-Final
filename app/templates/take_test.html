@@ -107,41 +107,61 @@
     <header class="test-header">
         <h1 class="test-title">{{ test.title }}</h1>
         <p class="test-meta">Instructor: <span style="font-weight: 600; color: #111827;">{{ test.teacher.name }}</span></p>
+        {% if test.is_timed %}
+        <p id="timer" style="color: #dc2626; font-weight: 700;"></p>
+        {% endif %}
     </header>
 
     <form method="POST" class="test-form">
-        <!-- Student Selection Area -->
+        <input type="hidden" name="start_time" value="{{ datetime.utcnow().isoformat() }}">
+
+        <!-- Student Selection -->
         <div class="selector-card">
-            <label class="label" style="margin-bottom: 0.5rem;">Select Student</label>
+            <label class="label">Select Student</label>
             <select name="student_id" class="select-field" required>
-                <option value="" disabled selected>Choose a student from the list...</option>
+                <option value="" disabled selected>Choose a student...</option>
                 {% for student in students %}
                 <option value="{{ student.id }}">{{ student.name }}</option>
                 {% endfor %}
             </select>
         </div>
 
-        <!-- Dynamic Questions List -->
+        <!-- Questions -->
         {% for question in test.questions %}
         <div class="question-card">
             <label class="label">
-                <span style="color: #4f46e5; margin-right: 0.5rem;">{{ loop.index }}.</span> 
-                {{ question.question_text }}
+                <span style="color: #4f46e5;">{{ loop.index }}.</span> {{ question.question_text }}
             </label>
-            <textarea 
-                name="question_{{ question.id }}" 
-                class="input-field" 
-                rows="4" 
-                placeholder="Type your response here..."
-                required
-            ></textarea>
+            <textarea name="question_{{ question.id }}" class="input-field" rows="4" placeholder="Type your response..." required></textarea>
         </div>
         {% endfor %}
 
-       <!-- Form Footer -->
         <div class="submit-container">
             <button type="submit" class="btn-submit">Submit Assessment</button>
         </div>
     </form>
 </div>
+
+{% if test.is_timed %}
+<script>
+let timeLeft = parseInt("{{ test.duration | default(0) }}") * 60; // duration in seconds
+const timerEl = document.getElementById('timer');
+
+if(timeLeft > 0) {
+    const countdown = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerEl.textContent = `Time Remaining: ${minutes}:${seconds.toString().padStart(2,'0')}`;
+        if(timeLeft <= 0) {
+            clearInterval(countdown);
+            timerEl.textContent = "Time's up!";
+            alert("Time is up! Please submit your test now.");
+        }
+        timeLeft--;
+    }, 1000);
+} else {
+    timerEl.textContent = "No timer set";
+}
+</script>
+{% endif %}
 {% endblock %}

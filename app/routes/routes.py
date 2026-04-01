@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect
 from app.extensions import db
+from datetime import datetime, timedelta
 from app.models import User, Test, Question, Submission, Answer
 
 bp = Blueprint("main", __name__)
@@ -60,8 +61,9 @@ def accounts():
 
 
 # ---------------
-# Test Management
+# Test Management (with Timed Test Support)
 # ---------------
+
 @bp.route("/create_test", methods=["GET", "POST"])
 def create_test():
     teachers = User.query.filter_by(role="teacher").all()
@@ -69,13 +71,20 @@ def create_test():
     if request.method == "POST":
         title = request.form.get("title")
         teacher_id = request.form.get("teacher_id")
+        is_timed = bool(request.form.get("is_timed"))
+        duration = request.form.get("duration")
+
         if not (title and teacher_id):
             return "Title and teacher selection required!"
 
-        test = Test(title=title, teacher_id=int(teacher_id))
+        test = Test(
+            title=title,
+            teacher_id=int(teacher_id),
+            is_timed=is_timed,
+            duration=int(duration) if duration else None
+        )
         db.session.add(test)
         db.session.commit()
-
         return redirect("/tests")
 
     return render_template("create_test.html", teachers=teachers)
@@ -91,14 +100,14 @@ def tests():
 def add_question(test_id):
     test = Test.query.get_or_404(test_id)
     question_text = request.form.get("question_text")
+    q_type = request.form.get("type", "open_ended")
 
     if not question_text:
         return "Question text is required!"
 
-    question = Question(test_id=test_id, question_text=question_text, type="open")
+    question = Question(test_id=test_id, question_text=question_text, type=q_type)
     db.session.add(question)
     db.session.commit()
-
     return redirect(f"/test/{test_id}/edit")
 
 
@@ -108,6 +117,7 @@ def take_test(test_id):
     students = User.query.filter_by(role="student").all()
 
     if request.method == "POST":
+        # Safe student ID
         try:
             student_id = int(request.form.get("student_id"))
         except (ValueError, TypeError):
@@ -117,14 +127,31 @@ def take_test(test_id):
         if not student:
             return "Selected user is not a valid student!"
 
+        # Prevent duplicate submissions
         existing = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
         if existing:
             return "You have already submitted this test!"
 
-        submission = Submission(test_id=test.id, student_id=student_id)
+        # --- TIMED TEST CHECK ---
+        is_late = False
+        if test.is_timed and test.duration:
+            start_time_str = request.form.get("start_time")
+            if start_time_str:
+                start_time = datetime.fromisoformat(start_time_str)
+                deadline = start_time + timedelta(minutes=test.duration)
+                if datetime.utcnow() > deadline:
+                    is_late = True
+
+        # Create submission
+        submission = Submission(
+            test_id=test.id,
+            student_id=student_id,
+            is_late=is_late
+        )
         db.session.add(submission)
         db.session.commit()
 
+        # Save answers
         for question in test.questions:
             answer_text = request.form.get(f"question_{question.id}", "")
             answer = Answer(submission_id=submission.id, question_id=question.id, answer_text=answer_text)
@@ -133,7 +160,13 @@ def take_test(test_id):
 
         return redirect("/tests")
 
-    return render_template("take_test.html", test=test, students=students)
+    # --- GET REQUEST ---
+    return render_template(
+        "take_test.html",
+        test=test,
+        students=students,
+        datetime=datetime  # pass to template for start_time
+    )
 
 
 @bp.route("/test/<int:test_id>/edit", methods=["GET", "POST"])
@@ -144,6 +177,9 @@ def edit_test(test_id):
     if request.method == "POST":
         test.title = request.form.get("title")
         test.teacher_id = int(request.form.get("teacher_id"))
+        test.is_timed = bool(request.form.get("is_timed"))
+        duration = request.form.get("duration")
+        test.duration = int(duration) if duration else None
         db.session.commit()
         return redirect("/tests")
 
@@ -170,6 +206,7 @@ def edit_question(question_id):
     question = Question.query.get_or_404(question_id)
     if request.method == "POST":
         question.question_text = request.form.get("question_text")
+        question.type = request.form.get("type", question.type)
         db.session.commit()
         return redirect(f"/test/{question.test_id}/edit")
     return render_template("edit_question.html", question=question)

@@ -90,11 +90,13 @@
 <div class="edit-container">
     <div class="section">
         <h1>Edit Test</h1>
+        <!-- Unified form: General info + Timed settings -->
         <form method="POST">
             <div class="form-group">
                 <label>Test Title</label>
                 <input type="text" name="title" value="{{ test.title }}" required>
             </div>
+
             <div class="form-group">
                 <label>Assigned Teacher</label>
                 <select name="teacher_id" required>
@@ -105,7 +107,20 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Save General Info</button>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_timed" value="1" {% if test.is_timed %}checked{% endif %}>
+                    Timed Test
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Duration (minutes)</label>
+                <input type="number" name="duration" min="1" value="{{ test.duration or '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Test Info</button>
         </form>
     </div>
 
@@ -119,7 +134,7 @@
                     <span class="question-type">{{ question.type }}</span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <a href="/question/{{ question.id }}/edit" style="color: #4a90e2; font-size: 0.9rem; font-weight: 600; text-decoration: none;">Edit</a>
+                    <a href="/question/{{ question.id }}/edit" class="btn-link">Edit</a>
                     <form method="POST" action="/question/{{ question.id }}/delete" style="margin:0">
                         <button type="submit" class="btn btn-delete" onclick="return confirm('Delete this question?')">Delete</button>
                     </form>
