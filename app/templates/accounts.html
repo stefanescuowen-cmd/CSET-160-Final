@@ -132,6 +132,13 @@
                 <option value="student" {% if request.args.get('role') == 'student' %}selected{% endif %}>Student</option>
                 <option value="teacher" {% if request.args.get('role') == 'teacher' %}selected{% endif %}>Teacher</option>
             </select>
+
+            <select name="sort" class="filter-select">
+                <option value="">Sort By</option>
+                <option value="name" {% if request.args.get('sort') == 'name' %}selected{% endif %}>Name</option>
+                <option value="date" {% if request.args.get('sort') == 'date' %}selected{% endif %}>Newest</option>
+            </select>
+
             <button type="submit" class="btn-filter">Filter</button>
 
         </form>
