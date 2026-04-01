@@ -143,8 +143,25 @@ def take_test(test_id):
         except (TypeError, ValueError):
             return "Invalid student selection!"
 
+        start_time_str = request.form.get("start_time")
+
+    if start_time_str:
+        try:
+            start_time = datetime.fromisoformat(start_time_str)
+        except ValueError:
+            return "Invalid time data"
+
+        if test.is_timed and test.duration:
+            elapsed = datetime.utcnow() - start_time
+            if elapsed > timedelta(minutes=test.duration):
+                return "Time expired! Submission rejected."
+
         # Find or create submission
-        submission = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
+        submission = Submission.query.filter_by(
+            test_id=test.id,
+            student_id=student_id
+        ).first()
+
         if not submission:
             submission = Submission(test_id=test.id, student_id=student_id)
             db.session.add(submission)
@@ -267,38 +284,22 @@ def grade_submission(submission_id):
     teachers = User.query.filter_by(role="teacher").all()
 
     if request.method == "POST":
-        submission.marks = int(request.form.get("marks"))
-        submission.graded_by = int(request.form.get("teacher_id"))
+        # Safe conversion for marks
+        try:
+            submission.marks = int(request.form.get("marks"))
+        except (TypeError, ValueError):
+            submission.marks = 0  # fallback if empty or invalid input
+
+        # Save which teacher graded it
+        graded_by_id = request.form.get("teacher_id")
+        if graded_by_id:
+            submission.graded_by = int(graded_by_id)
+
         db.session.commit()
         return redirect(f"/test/{submission.test_id}/submissions")
 
-    return render_template("grade_submission.html", submission=submission, teachers=teachers)
-
-
-@bp.route("/student/<int:student_id>/results")
-def student_results(student_id):
-    student = User.query.get_or_404(student_id)
-    submissions = Submission.query.filter_by(student_id=student.id).all()
-    return render_template("student_results.html", student=student, submissions=submissions)
-
-
-@bp.route("/tests/summary")
-def tests_summary():
-    tests = Test.query.all()
-    tests_info = []
-    for t in tests:
-        student_count = Submission.query.filter_by(test_id=t.id).count()
-        tests_info.append({
-            "id": t.id,
-            "title": t.title,
-            "teacher": t.teacher.name if t.teacher else "N/A",
-            "student_count": student_count
-        })
-    return render_template("tests_summary.html", tests=tests_info)
-
-
-@bp.route("/test/<int:test_id>/summary")
-def test_summary(test_id):
-    test = Test.query.get_or_404(test_id)
-    submissions = Submission.query.filter_by(test_id=test.id).all()
-    return render_template("test_summary.html", test=test, submissions=submissions)
+    return render_template(
+        "grade_submission.html",
+        submission=submission,
+        teachers=teachers
+    )

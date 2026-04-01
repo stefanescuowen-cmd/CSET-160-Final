@@ -34,7 +34,7 @@
     .student-info h3 { margin: 0; font-size: 1.125rem; font-weight: 700; color: #111827; }
     
     /* Grade Badges */
-    .grade-info { display: flex; align-items: center; gap: 1rem; }
+    .grade-info { display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
     .badge {
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
@@ -51,6 +51,9 @@
         text-decoration: none;
     }
     .grade-link:hover { text-decoration: underline; }
+
+    /* Grader info */
+    .grader-info { font-size: 0.75rem; color: #6b7280; }
 
     /* Answers Section */
     .answers-section { padding: 1.5rem; }
@@ -90,12 +93,22 @@
                     <h3>{{ submission.student.name }}</h3>
                 </div>
                 <div class="grade-info">
-                    <span class="badge {% if submission.marks %}badge-graded{% else %}badge-pending{% endif %}">
-                        Marks: {{ submission.marks or "Not graded" }}
+                    <span class="badge {% if submission.marks is not none %}badge-graded{% else %}badge-pending{% endif %}">
+                        Marks: {{ submission.marks if submission.marks is not none else "Not graded" }}
                     </span>
                     
-                    {% if submission.test.teacher_id != submission.graded_by %}
-                        <a href="/submission/{{ submission.id }}/grade" class="grade-link">Grade Review →</a>
+                    <a href="/submission/{{ submission.id }}/grade" class="grade-link">
+                        {% if submission.marks is not none %}
+                            Edit Grade →
+                        {% else %}
+                            Grade →
+                        {% endif %}
+                    </a>
+
+                    {% if submission.graded_by %}
+                        <div class="grader-info">
+                            Graded by: {{ submission.grader.name }}
+                        </div>
                     {% endif %}
                 </div>
             </div>
