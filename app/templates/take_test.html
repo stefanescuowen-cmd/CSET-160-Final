@@ -58,7 +58,7 @@
                 <span style="color: #4f46e5;">{{ loop.index + (page-1)*10 }}.</span> {{ question.question_text }}
             </label>
 
-            {% if question.type == "mcq" %}
+            {% if question.type == "mcq" and question.option_a %}
                 <label><input type="radio" name="question_{{ question.id }}" value="A"
                     {% if answers_dict.get(question.id) == 'A' %}checked{% endif %}> {{ question.option_a }}</label><br>
                 <label><input type="radio" name="question_{{ question.id }}" value="B"
