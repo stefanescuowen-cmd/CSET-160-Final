@@ -143,25 +143,40 @@
 </div>
 
 {% if test.is_timed %}
-<script>
-let timeLeft = parseInt("{{ test.duration | default(0) }}") * 60; // duration in seconds
-const timerEl = document.getElementById('timer');
+<div id="timer" style="font-weight: 600; color: #b91c1c; margin-bottom: 1rem;">
+    Time Remaining: --:--
+</div>
 
-if(timeLeft > 0) {
-    const countdown = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerEl.textContent = `Time Remaining: ${minutes}:${seconds.toString().padStart(2,'0')}`;
-        if(timeLeft <= 0) {
-            clearInterval(countdown);
-            timerEl.textContent = "Time's up!";
-            alert("Time is up! Please submit your test now.");
-        }
-        timeLeft--;
-    }, 1000);
-} else {
-    timerEl.textContent = "No timer set";
+<script>
+// Get test duration from server (in seconds)
+let timeLeft = parseInt("{{ test.duration | default(0) }}") * 60; 
+const timerEl = document.getElementById('timer');
+const testForm = document.querySelector('.test-form');
+
+function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 }
+
+// Initialize timer display
+timerEl.textContent = `Time Remaining: ${formatTime(timeLeft)}`;
+
+const countdown = setInterval(() => {
+    timeLeft--;
+
+    if(timeLeft >= 0){
+        timerEl.textContent = `Time Remaining: ${formatTime(timeLeft)}`;
+    }
+
+    // Auto-submit when time runs out
+    if(timeLeft < 0){
+        clearInterval(countdown);
+        timerEl.textContent = "Time's up! Submitting test...";
+        alert("Time is up! Your test will now be submitted.");
+        testForm.submit();
+    }
+}, 1000);
 </script>
 {% endif %}
 {% endblock %}
