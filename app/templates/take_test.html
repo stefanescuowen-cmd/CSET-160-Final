@@ -22,7 +22,9 @@
 <div class="test-container">
     <header class="test-header">
         <h1 class="test-title">{{ test.title }}</h1>
-        <p class="test-meta">Instructor: <span style="font-weight: 600; color: #111827;">{{ test.teacher.name }}</span></p>
+        <p class="test-meta">
+            Instructor: <span style="font-weight: 600; color: #111827;">{{ test.teacher.name }}</span>
+        </p>
         {% if test.is_timed %}
         <p id="timer">Time Remaining: --:--</p>
         {% endif %}
@@ -43,10 +45,10 @@
         </div>
 
         <!-- Questions -->
-        {% for question in test.questions %}
+        {% for question in questions %}
         <div class="question-card">
             <label class="label">
-                <span style="color: #4f46e5;">{{ loop.index }}.</span> {{ question.question_text }}
+                <span style="color: #4f46e5;">{{ loop.index + (page-1)*10 }}.</span> {{ question.question_text }}
             </label>
 
             {% if question.type == "mcq" %}
@@ -64,6 +66,13 @@
             <button type="submit" class="btn-submit">Submit Assessment</button>
         </div>
     </form>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if page * 10 < total %}
+        <a href="{{ url_for('main.take_test', test_id=test.id, page=page+1) }}" class="btn-next">Next Page</a>
+        {% endif %}
+    </div>
 </div>
 
 {% if test.is_timed %}
@@ -95,5 +104,3 @@ const countdown = setInterval(() => {
 }, 1000);
 </script>
 {% endif %}
-
-{% endblock %}
