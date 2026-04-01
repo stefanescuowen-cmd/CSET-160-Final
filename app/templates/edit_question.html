@@ -2,7 +2,6 @@
 
 {% block content %}
 <style>
-    /* Container & Layout */
     .edit-container {
         max-width: 600px;
         margin: 3rem auto;
@@ -10,7 +9,6 @@
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    /* Back Link */
     .back-link {
         display: inline-flex;
         align-items: center;
@@ -19,40 +17,30 @@
         color: #4f46e5;
         text-decoration: none;
         margin-bottom: 1.5rem;
-        transition: color 0.2s;
     }
-    .back-link:hover { color: #4338ca; }
 
-    /* Card Styling */
     .form-card {
         background: white;
         border-radius: 1rem;
         border: 1px solid #e5e7eb;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
     }
+
     .card-header {
         padding: 1.5rem 2rem;
         background: #f9fafb;
         border-bottom: 1px solid #e5e7eb;
     }
-    .card-header h1 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #111827;
-    }
 
-    /* Form Fields */
     .form-body { padding: 2rem; }
+
     .form-group { margin-bottom: 1.5rem; }
-    
+
     .label {
         display: block;
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
         color: #374151;
         margin-bottom: 0.5rem;
     }
@@ -63,40 +51,40 @@
         border-radius: 0.75rem;
         border: 1px solid #e5e7eb;
         background-color: #f9fafb;
-        font-size: 1rem;
-        transition: all 0.2s;
-    }
-    .input-field:focus, .select-field:focus {
-        outline: none;
-        background-color: white;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
 
-    /* Action Buttons */
+    .input-field:focus, .select-field:focus {
+        outline: none;
+        border-color: #4f46e5;
+        background: white;
+    }
+
+    .mcq-box {
+        display: none;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px dashed #c7d2fe;
+        border-radius: 0.75rem;
+        background: #f8faff;
+    }
+
     .form-footer {
         display: flex;
-        align-items: center;
         justify-content: flex-end;
         gap: 1rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #f3f4f6;
+        margin-top: 1.5rem;
     }
+
     .btn-save {
         padding: 0.75rem 2rem;
         background-color: #4f46e5;
         color: white;
-        font-weight: 700;
         border-radius: 0.75rem;
         border: none;
         cursor: pointer;
-        transition: transform 0.1s, background-color 0.2s;
     }
-    .btn-save:hover { background-color: #4338ca; transform: translateY(-1px); }
-    .btn-save:active { transform: translateY(0); }
-    
+
     .btn-cancel {
-        font-size: 0.875rem;
         color: #6b7280;
         text-decoration: none;
         font-weight: 600;
@@ -114,24 +102,77 @@
         </div>
 
         <form method="POST" class="form-body">
+
+            <!-- Question Text -->
             <div class="form-group">
                 <label class="label">Question Text</label>
-                <textarea name="question_text" class="input-field" rows="3" required placeholder="Type your question here...">{{ question.question_text }}</textarea>
+                <textarea name="question_text" class="input-field" rows="3" required>{{ question.question_text }}</textarea>
             </div>
 
+            <!-- Type -->
             <div class="form-group">
                 <label class="label">Response Type</label>
-                <select name="type" class="select-field">
-                    <option value="open_ended" {% if question.type == "open_ended" %}selected{% endif %}>Open Ended</option>
-                    <option value="mcq" {% if question.type == "mcq" %}selected{% endif %}>Multiple Choice (MCQ)</option>
+                <select name="type" id="typeSelect" class="select-field">
+                    <option value="open" {% if question.type == "open" %}selected{% endif %}>Open Ended</option>
+                    <option value="mcq" {% if question.type == "mcq" %}selected{% endif %}>MCQ</option>
                 </select>
             </div>
 
+            <!-- MCQ OPTIONS -->
+            <div id="mcqBox" class="mcq-box">
+                <div class="form-group">
+                    <label class="label">Option A</label>
+                    <input type="text" name="option_a" class="input-field" value="{{ question.option_a or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Option B</label>
+                    <input type="text" name="option_b" class="input-field" value="{{ question.option_b or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Option C</label>
+                    <input type="text" name="option_c" class="input-field" value="{{ question.option_c or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Option D</label>
+                    <input type="text" name="option_d" class="input-field" value="{{ question.option_d or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Correct Answer</label>
+                    <select name="correct_answer" class="select-field">
+                        <option value="A" {% if question.correct_answer == "A" %}selected{% endif %}>A</option>
+                        <option value="B" {% if question.correct_answer == "B" %}selected{% endif %}>B</option>
+                        <option value="C" {% if question.correct_answer == "C" %}selected{% endif %}>C</option>
+                        <option value="D" {% if question.correct_answer == "D" %}selected{% endif %}>D</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-footer">
-                <a href="/test/{{ question.test_id }}/edit" class="btn-cancel">Discard</a>
+                <a href="/test/{{ question.test_id }}/edit" class="btn-cancel">Cancel</a>
                 <button type="submit" class="btn-save">Save Changes</button>
             </div>
+
         </form>
     </div>
 </div>
+
+<script>
+const typeSelect = document.getElementById("typeSelect");
+const mcqBox = document.getElementById("mcqBox");
+
+// Show correctly on load
+if (typeSelect.value === "mcq") {
+    mcqBox.style.display = "block";
+}
+
+// Toggle
+typeSelect.addEventListener("change", () => {
+    mcqBox.style.display = typeSelect.value === "mcq" ? "block" : "none";
+});
+</script>
+
 {% endblock %}

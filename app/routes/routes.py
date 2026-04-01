@@ -224,11 +224,28 @@ def view_submissions(test_id):
 @bp.route("/question/<int:question_id>/edit", methods=["GET", "POST"])
 def edit_question(question_id):
     question = Question.query.get_or_404(question_id)
+
     if request.method == "POST":
         question.question_text = request.form.get("question_text")
         question.type = request.form.get("type", question.type)
+
+        if question.type == "mcq":
+            question.option_a = request.form.get("option_a")
+            question.option_b = request.form.get("option_b")
+            question.option_c = request.form.get("option_c")
+            question.option_d = request.form.get("option_d")
+            question.correct_answer = request.form.get("correct_answer")
+        else:
+            # Clear MCQ fields if switching back
+            question.option_a = None
+            question.option_b = None
+            question.option_c = None
+            question.option_d = None
+            question.correct_answer = None
+
         db.session.commit()
         return redirect(f"/test/{question.test_id}/edit")
+
     return render_template("edit_question.html", question=question)
 
 
