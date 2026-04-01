@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ test.title }} - Submissions</h1>
+
+<ul>
+    {% for submission in submissions %}
+    <li>
+        Student: {{ submission.student.name }} |
+        Marks: {{ submission.marks or "Not graded" }} |
+        Graded by: {{ submission.grader.name if submission.grader else "N/A" }}
+        <br>
+        Answers:
+        <ul>
+            {% for answer in submission.answers %}
+            <li>{{ answer.question.question_text }}: {{ answer.answer_text }}</li>
+            {% endfor %}
+        </ul>
+        <a href="/submission/{{ submission.id }}/grade">Grade Submission</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

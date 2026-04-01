@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    h1 { color: #1a202c; margin: 0; font-size: 1.75rem; }
+
+    .test-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        border: 1px solid #edf2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .test-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .test-info strong {
+        display: block;
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 4px;
+    }
+
+    .test-info span {
+        color: #718096;
+        font-size: 0.85rem;
+    }
+
+    .test-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn {
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-outline {
+        color: #4a90e2;
+        border: 1px solid #4a90e2;
+    }
+
+    .btn-outline:hover {
+        background: #f0f7ff;
+    }
+
+    .btn-take {
+        background: #4a90e2;
+        color: white;
+    }
+
+    .btn-take:hover {
+        background: #357abd;
+    }
+
+    .btn-delete {
+        background: none;
+        border: none;
+        color: #e53e3e;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 8px;
+    }
+
+    .btn-delete:hover {
+        color: #c53030;
+        text-decoration: underline;
+    }
+
+    .btn-create {
+        background: #10b981;
+        color: white;
+        padding: 10px 20px;
+    }
+
+    .btn-create:hover {
+        background: #059669;
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="header-flex">
+        <h1>All Tests</h1>
+        <a href="/create_test" class="btn btn-create">+ Create New Test</a>
+    </div>
+
+    <div class="test-list">
+        {% for test in tests %}
+        <div class="test-card">
+            <div class="test-info">
+                <strong>{{ test.title }}</strong>
+                <span>Created by: {{ test.teacher.name }}</span>
+            </div>
+
+            <div class="test-actions">
+                <a href="/test/{{ test.id }}/submissions" class="btn btn-outline">Submissions</a>
+                <a href="/test/{{ test.id }}/edit" class="btn btn-outline">Edit</a>
+                <a href="/test/{{ test.id }}" class="btn btn-take">Take Test</a>
+                
+                <form method="POST" action="/test/{{ test.id }}/delete" style="margin:0">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Delete this test?')">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
