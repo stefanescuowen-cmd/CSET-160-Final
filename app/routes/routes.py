@@ -98,14 +98,27 @@ def tests():
 
 @bp.route("/test/<int:test_id>/add_question", methods=["POST"])
 def add_question(test_id):
-    test = Test.query.get_or_404(test_id)
     question_text = request.form.get("question_text")
-    q_type = request.form.get("type", "open_ended")
+    q_type = request.form.get("type")
 
-    if not question_text:
-        return "Question text is required!"
+    if q_type == "mcq":
+        question = Question(
+            test_id=test_id,
+            question_text=question_text,
+            type="mcq",
+            option_a=request.form.get("option_a"),
+            option_b=request.form.get("option_b"),
+            option_c=request.form.get("option_c"),
+            option_d=request.form.get("option_d"),
+            correct_answer=request.form.get("correct_answer")
+        )
+    else:
+        question = Question(
+            test_id=test_id,
+            question_text=question_text,
+            type="open"
+        )
 
-    question = Question(test_id=test_id, question_text=question_text, type=q_type)
     db.session.add(question)
     db.session.commit()
     return redirect(f"/test/{test_id}/edit")

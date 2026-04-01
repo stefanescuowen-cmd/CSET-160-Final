@@ -29,12 +29,17 @@ CREATE TABLE tests (
     FOREIGN KEY (teacher_id) REFERENCES users(id)
 );
 
--- Questions table
+-- Questions table (updated for MCQs)
 CREATE TABLE questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     test_id INT,
     question_text TEXT,
-    type ENUM('open') DEFAULT 'open',
+    type ENUM('open', 'mcq') DEFAULT 'open',
+    option_a VARCHAR(255),
+    option_b VARCHAR(255),
+    option_c VARCHAR(255),
+    option_d VARCHAR(255),
+    correct_answer CHAR(1),  -- 'A', 'B', 'C', or 'D'
     FOREIGN KEY (test_id) REFERENCES tests(id)
 );
 
