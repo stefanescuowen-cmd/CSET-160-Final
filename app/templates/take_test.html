@@ -32,6 +32,10 @@
 
     <form method="POST" class="test-form">
         <input type="hidden" name="start_time" value="{{ datetime.utcnow().isoformat() }}">
+        <input type="hidden" name="current_page" value="{{ page }}">
+        {% if student_id %}
+        <input type="hidden" name="student_id" value="{{ student_id }}">
+        {% endif %}
 
         <!-- Student Selection -->
         <div class="selector-card">
@@ -40,7 +44,7 @@
                 <option value="" disabled selected>Choose a student...</option>
                 {% for student in students %}
                 <option value="{{ student.id }}"
-                    {% if answers_dict and answers_dict.get('student_id') == student.id %}selected{% endif %}>
+                    {% if student_id == student.id %}selected{% endif %}>
                     {{ student.name }}
                 </option>
                 {% endfor %}
@@ -56,16 +60,16 @@
 
             {% if question.type == "mcq" %}
                 <label><input type="radio" name="question_{{ question.id }}" value="A"
-                    {% if answers_dict and answers_dict.get(question.id) == 'A' %}checked{% endif %}> {{ question.option_a }}</label><br>
+                    {% if answers_dict.get(question.id) == 'A' %}checked{% endif %}> {{ question.option_a }}</label><br>
                 <label><input type="radio" name="question_{{ question.id }}" value="B"
-                    {% if answers_dict and answers_dict.get(question.id) == 'B' %}checked{% endif %}> {{ question.option_b }}</label><br>
+                    {% if answers_dict.get(question.id) == 'B' %}checked{% endif %}> {{ question.option_b }}</label><br>
                 <label><input type="radio" name="question_{{ question.id }}" value="C"
-                    {% if answers_dict and answers_dict.get(question.id) == 'C' %}checked{% endif %}> {{ question.option_c }}</label><br>
+                    {% if answers_dict.get(question.id) == 'C' %}checked{% endif %}> {{ question.option_c }}</label><br>
                 <label><input type="radio" name="question_{{ question.id }}" value="D"
-                    {% if answers_dict and answers_dict.get(question.id) == 'D' %}checked{% endif %}> {{ question.option_d }}</label><br>
+                    {% if answers_dict.get(question.id) == 'D' %}checked{% endif %}> {{ question.option_d }}</label><br>
             {% else %}
                 <textarea name="question_{{ question.id }}" class="input-field" rows="4"
-                    placeholder="Type your response...">{% if answers_dict %}{{ answers_dict.get(question.id, '') }}{% endif %}</textarea>
+                    placeholder="Type your response...">{{ answers_dict.get(question.id, '') }}</textarea>
             {% endif %}
         </div>
         {% endfor %}

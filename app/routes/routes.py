@@ -129,7 +129,7 @@ def take_test(test_id):
     test = Test.query.get_or_404(test_id)
     students = User.query.filter_by(role="student").all()
 
-    # --- Pagination ---
+    # Pagination
     page = request.args.get("page", 1, type=int)
     per_page = 10
     questions = Question.query.filter_by(test_id=test.id)\
@@ -163,20 +163,19 @@ def take_test(test_id):
 
         # Handle pagination buttons
         if request.form.get("next_page") == "next":
-            return redirect(url_for("main.take_test", test_id=test.id, page=page+1))
+            return redirect(url_for("main.take_test", test_id=test.id, page=page+1, student_id=student_id))
         elif request.form.get("next_page") == "prev":
-            return redirect(url_for("main.take_test", test_id=test.id, page=page-1))
+            return redirect(url_for("main.take_test", test_id=test.id, page=page-1, student_id=student_id))
         else:  # final submission
             return redirect("/tests")
 
     # Pre-fill answers for student
-    answers_dict = {}
     student_id = request.args.get("student_id", type=int)
+    answers_dict = {}
     if student_id:
         submission = Submission.query.filter_by(test_id=test.id, student_id=student_id).first()
         if submission:
             answers_dict = {a.question_id: a.answer_text for a in submission.answers}
-            answers_dict['student_id'] = student_id  # keep student selection pre-filled
 
     return render_template(
         "take_test.html",
@@ -186,7 +185,8 @@ def take_test(test_id):
         page=page,
         total=total,
         answers_dict=answers_dict,
-        datetime=datetime
+        datetime=datetime,
+        student_id=student_id
     )
 
 @bp.route("/test/<int:test_id>/edit", methods=["GET", "POST"])
