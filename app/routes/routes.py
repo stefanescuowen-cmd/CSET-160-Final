@@ -272,15 +272,18 @@ def test_summary(test_id):
 @bp.route("/student/<int:student_id>/results")
 def student_results(student_id):
     student = User.query.get_or_404(student_id)
-    # Get all submissions for this student
     submissions = Submission.query.filter_by(student_id=student.id).all()
     results = []
+
     for s in submissions:
+        test_title = s.test.title if s.test else "Unknown Test"  # handles None
+        grader_name = s.grader.name if s.grader else "Not graded"
         results.append({
-            "test_title": s.test.title,
+            "test_title": test_title,
             "marks": s.marks,
-            "graded_by": s.grader.name if s.grader else "Not graded",
+            "graded_by": grader_name,
             "submitted_at": s.submitted_at,
             "is_late": s.is_late
         })
+
     return render_template("student_results.html", student=student, results=results)
