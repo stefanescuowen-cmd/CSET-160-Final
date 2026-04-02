@@ -1,41 +1,134 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Results for {{ student.name }}</h1>
 
-{% if submissions %}
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>Test Title</th>
-            <th>Marks Achieved</th>
-            <th>Graded By (Teacher)</th>
-            <th>Submission Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for submission in submissions %}
-        <tr>
-            <td>
-                {% if submission.test_id %}
-                    <a href="/test/{{ submission.test_id }}/summary">
+<style>
+    /* Container */
+    .results-container {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 2rem;
+    }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    thead {
+        background-color: #f3f4f6;
+    }
+
+    th, td {
+        padding: 1rem;
+        text-align: left;
+        font-size: 0.875rem;
+        color: #111827;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+    }
+
+    tr:hover {
+        background-color: #f9fafb;
+    }
+
+    a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        color: #1d4ed8;
+    }
+
+    /* Back Link Button */
+    .back-link {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.5rem 1rem;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .back-link:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #9ca3af;
+        font-style: italic;
+        background-color: #f9fafb;
+        border-radius: 0.75rem;
+    }
+</style>
+
+<div class="results-container">
+    <h1>Results for {{ student.name }}</h1>
+
+    {% if submissions %}
+    <table>
+        <thead>
+            <tr>
+                <th>Test Title</th>
+                <th>Marks Achieved</th>
+                <th>Graded By (Teacher)</th>
+                <th>Submission Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for submission in submissions %}
+            <tr>
+                <td>
+                    {% if submission.test_id %}
+                        <a href="/test/{{ submission.test_id }}/summary">
+                            {{ submission.test_title }}
+                        </a>
+                    {% else %}
                         {{ submission.test_title }}
-                    </a>
-                {% else %}
-                    {{ submission.test_title }}
-                {% endif %}
-            </td>
+                    {% endif %}
+                </td>
+                <td>{{ submission.marks }}</td>
+                <td>{{ submission.graded_by }}</td>
+                <td>{{ submission.submitted_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        This student has not taken any tests yet.
+    </div>
+    {% endif %}
 
-            <td>{{ submission.marks }}</td>
-            <td>{{ submission.graded_by }}</td>
-            <td>{{ submission.submitted_at }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>This student has not taken any tests yet.</p>
-{% endif %}
+    <a href="/accounts" class="back-link">Back to Accounts</a>
+</div>
 
-<a href="/accounts">Back to Accounts</a>
 {% endblock %}
