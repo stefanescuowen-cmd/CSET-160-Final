@@ -119,7 +119,7 @@
             {% for test in tests %}
             <tr>
                 <td style="font-weight: 600;">{{ test.title }}</td>
-                <td>{{ test.teacher }}</td>
+                <td>{{ test.teacher.name if test.teacher else "N/A" }}</td>
                 <td><span class="count-badge">{{ test.student_count }}</span></td>
                 <td>
                     <div class="actions">

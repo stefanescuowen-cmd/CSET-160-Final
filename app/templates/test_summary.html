@@ -102,37 +102,45 @@
 
 <div class="summary-card">
     <div class="table-header">
-        <h1>Tests Summary</h1>
+        <h1>{{ test.title }} — Submissions</h1>
+        <p>Created by: {{ test.teacher.name if test.teacher else "N/A" }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Test Title</th>
-                <th>Created By</th>
-                <th>Students</th>
-                <th>Actions</th>
+                <th>Student</th>
+                <th>Marks</th>
+                <th>Graded By</th>
             </tr>
         </thead>
         <tbody>
-            {% for test in tests %}
+            {% for submission in submissions %}
             <tr>
-                <td style="font-weight: 600;">{{ test.title }}</td>
-                <td>{{ test.teacher.name if test.teacher else "N/A" }}</td>
-                <td><span class="count-badge">{{ test.student_count }}</span></td>
+                <td>{{ submission.student.name if submission.student else "N/A" }}</td>
                 <td>
-                    <div class="actions">
-                        <!-- Correct link to test_summary -->
-                        <a href="{{ url_for('bp.test_summary', test_id=test.id) }}" class="btn-link">View</a>
-                        <a href="{{ url_for('bp.edit_test', test_id=test.id) }}" class="btn-link">Edit</a>
-                        <form method="POST" action="{{ url_for('bp.delete_test', test_id=test.id) }}" style="margin:0;">
-                            <button type="submit" class="btn-delete" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    </div>
+                    {% if submission.marks is not none %}
+                        {{ submission.marks }}
+                    {% else %}
+                        Not graded
+                    {% endif %}
                 </td>
+                <td>
+                    {% if submission.grader %}
+                        {{ submission.grader.name }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align:center; color:#718096;">No submissions yet.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <a href="{{ url_for('bp.tests_summary') }}">← Back to Tests Summary</a>
 </div>
 {% endblock %}
