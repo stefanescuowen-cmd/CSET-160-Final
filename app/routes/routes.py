@@ -264,3 +264,23 @@ def test_summary(test_id):
     test = Test.query.get_or_404(test_id)
     submissions = Submission.query.filter_by(test_id=test.id).all()
     return render_template("test_summary.html", test=test, submissions=submissions)
+
+# ---------------
+# Student Results
+# ---------------
+
+@bp.route("/student/<int:student_id>/results")
+def student_results(student_id):
+    student = User.query.get_or_404(student_id)
+    # Get all submissions for this student
+    submissions = Submission.query.filter_by(student_id=student.id).all()
+    results = []
+    for s in submissions:
+        results.append({
+            "test_title": s.test.title,
+            "marks": s.marks,
+            "graded_by": s.grader.name if s.grader else "Not graded",
+            "submitted_at": s.submitted_at,
+            "is_late": s.is_late
+        })
+    return render_template("student_results.html", student=student, results=results)

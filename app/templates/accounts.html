@@ -70,30 +70,22 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
-    .user-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-    .user-table thead {
-        background-color: #f9fafb;
-        border-bottom: 1px solid #e5e7eb;
-    }
-    .user-table th {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6b7280;
-    }
-    .user-table td {
-        padding: 1rem 1.5rem;
-        font-size: 0.875rem;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    .user-table tr:last-child td { border-bottom: none; }
-    .user-table tr:hover { background-color: #f9fafb; }
+    .user-table .btn-results {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.user-table .btn-results:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+}
 
     .user-name { font-weight: 600; color: #111827; }
     .user-email { color: #4b5563; }
@@ -144,6 +136,30 @@
         </form>
     </header>
 
+    <div class="manage-container">
+    <header class="page-header">
+        <div class="header-title">
+            <h1>User Management</h1>
+            <p>Manage and filter all registered accounts.</p>
+        </div>
+
+        <form method="GET" action="/accounts" class="filter-form">
+            <select name="role" class="filter-select">
+                <option value="">All Roles</option>
+                <option value="student" {% if request.args.get('role') == 'student' %}selected{% endif %}>Student</option>
+                <option value="teacher" {% if request.args.get('role') == 'teacher' %}selected{% endif %}>Teacher</option>
+            </select>
+
+            <select name="sort" class="filter-select">
+                <option value="">Sort By</option>
+                <option value="name" {% if request.args.get('sort') == 'name' %}selected{% endif %}>Name</option>
+                <option value="date" {% if request.args.get('sort') == 'date' %}selected{% endif %}>Newest</option>
+            </select>
+
+            <button type="submit" class="btn-filter">Filter</button>
+        </form>
+    </header>
+
     <div class="table-card">
         <table class="user-table">
             <thead>
@@ -151,6 +167,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -163,14 +180,20 @@
                             {{ user.role }}
                         </span>
                     </td>
+                    <td>
+                        {% if user.role == 'student' %}
+                            <a href="/student/{{ user.id }}/results" class="btn-results">View Results</a>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="3" class="empty-state">No users found matching your criteria.</td>
+                    <td colspan="4" class="empty-state">No users found matching your criteria.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
 
 {% endblock %}
