@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from app.extensions import db
 from datetime import datetime, timedelta
 from app.models import User, Test, Question, Submission, Answer
+from app.models.submission import Submission
 
 bp = Blueprint("main", __name__, template_folder="../templates")
 

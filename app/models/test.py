@@ -13,4 +13,4 @@ class Test(db.Model):
     # Relationships
     teacher = db.relationship("User", back_populates="tests_created")
     questions = db.relationship("Question", back_populates="test", lazy=True)
-    submissions = db.relationship("Submission", back_populates="test", lazy=True)
+    submissions = db.relationship("Submission", back_populates="test", lazy="select")

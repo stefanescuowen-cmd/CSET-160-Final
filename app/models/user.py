@@ -10,6 +10,14 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     # Relationships
-    submissions = db.relationship("Submission", back_populates="student", foreign_keys="Submission.student_id")
-    graded_submissions = db.relationship("Submission", back_populates="grader", foreign_keys="Submission.graded_by")
+    submissions = db.relationship(
+        "Submission",
+        back_populates="student",
+        foreign_keys="Submission.student_id"
+    )
+    graded_submissions = db.relationship(
+        "Submission",
+        back_populates="grader",
+        foreign_keys="Submission.graded_by"
+    )
     tests_created = db.relationship("Test", back_populates="teacher")

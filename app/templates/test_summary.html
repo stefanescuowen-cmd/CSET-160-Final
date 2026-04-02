@@ -101,10 +101,8 @@
 </style>
 
 <div class="summary-card">
-    <div class="table-header">
-        <h1>{{ test.title }} — Submissions</h1>
-        <p>Created by: {{ test.teacher.name if test.teacher else "N/A" }}</p>
-    </div>
+    <h1>{{ test.title }}</h1>
+    <p>Created by: {{ test.teacher.name if test.teacher else "N/A" }}</p>
 
     <table>
         <thead>
@@ -118,6 +116,7 @@
             {% for submission in submissions %}
             <tr>
                 <td>{{ submission.student.name if submission.student else "N/A" }}</td>
+
                 <td>
                     {% if submission.marks is not none %}
                         {{ submission.marks }}
@@ -125,22 +124,20 @@
                         Not graded
                     {% endif %}
                 </td>
+
                 <td>
                     {% if submission.grader %}
-                        {{ submission.grader.name }}
+                        {{ submission.grader.name if submission.grader else "Unknown" }}
                     {% else %}
                         —
                     {% endif %}
                 </td>
             </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" style="text-align:center; color:#718096;">No submissions yet.</td>
-            </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ url_for('bp.tests_summary') }}">← Back to Tests Summary</a>
+    <br>
+    <a href="/tests/summary">← Back</a>
 </div>
 {% endblock %}
